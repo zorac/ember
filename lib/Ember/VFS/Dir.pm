@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
-package Ember::FS::Dir;
+package Ember::VFS::Dir;
 
 use strict;
 use warnings;
-use base qw( Ember::FS );
+use base qw( Ember::VFS );
 
 use File::Slurp;
 

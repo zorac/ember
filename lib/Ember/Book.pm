@@ -4,22 +4,20 @@ package Ember::Book;
 
 use strict;
 use warnings;
-use fields qw( filename fs chapters );
+use fields qw( filename vfs chapters );
 
-# TODO dynamic format loading
-use Ember::EPub::Book;
-use Ember::FS;
+use Ember::VFS;
 
 my %HINTS = (
     epub    => 'EPub',
 );
 
 sub new {
-    my ($self, $fs) = @_;
-    my $filename = $fs->{filename};
+    my ($self, $vfs) = @_;
+    my $filename = $vfs->{filename};
 
     $self = fields::new($self) unless (ref($self));
-    $self->{fs} = $fs;
+    $self->{vfs} = $vfs;
     $self->{filename} = $filename;
     $self->{chapters} = [];
 
@@ -27,12 +25,13 @@ sub new {
 }
 
 sub open {
-    my ($class, $fs) = @_;
+    my ($class, $vfs) = @_;
 
-    $fs = Ember::FS->open($fs) if (!$fs->isa('Ember::FS'));
+    $vfs = Ember::VFS->open($vfs) if (!$vfs->isa('Ember::VFS'));
 
     if (1) {
-        return Ember::EPub::Book->new($fs);
+        require Ember::EPub::Book;
+        return Ember::EPub::Book->new($vfs);
     }
 
     # TODO support other formats

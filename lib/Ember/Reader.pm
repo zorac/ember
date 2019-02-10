@@ -94,7 +94,7 @@ sub display {
     my $line = $first;
 
     $last = $self->{line_count} if ($last > $self->{line_count});
-    
+
     $self->{pos} = $self->{lines_pos}[$first];
     $self->{screen}->Cls();
     $self->{screen}->Cursor(0, 0);
@@ -129,7 +129,7 @@ sub resize {
 
 sub page_prev() {
     my ($self) = @_;
-    
+
     if ($self->{page} <= 0) {
         my $chapter = $self->{chapter}{prev};
 
@@ -147,7 +147,7 @@ sub page_prev() {
 
 sub page_next() {
     my ($self) = @_;
-    
+
     $self->{page}++;
 
     if ($self->{page} >= $self->{page_count}) {

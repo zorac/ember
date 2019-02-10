@@ -1,14 +1,10 @@
 #!/usr/bin/perl
 
-package Ember::FS;
+package Ember::VFS;
 
 use strict;
 use warnings;
 use fields qw( filename );
-
-# TODO load submodules on demand
-use Ember::FS::Dir;
-use Ember::FS::Zip;
 
 my %HINTS = (
     epub    => 'Zip',
@@ -27,16 +23,21 @@ sub new {
 sub open {
     my ($class, $filename) = @_;
 
-    return Ember::FS::Dir->new($filename) if (-d $filename);
-    return Ember::FS::Zip->new($filename);
-    
+    if (-d $filename) {
+        require Ember::VFS::Dir;
+        return Ember::VFS::Dir->new($filename)
+    } else {
+        require Ember::VFS::Zip;
+        return Ember::VFS::Zip->new($filename);
+    }
+
     # TODO use hints, check all...
 
-    die('Unable to determine FS type')
+    die('Unable to determine VFS type')
 }
 
 sub _open {
-    die('Cannot directly instantiate Ember::FS');
+    die('Cannot directly instantiate Ember::VFS');
 }
 
 # To implement in subclasses:

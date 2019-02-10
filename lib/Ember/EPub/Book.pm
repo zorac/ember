@@ -14,14 +14,14 @@ use XML::Simple;
 
 sub _open {
     my ($self) = @_;
-    my $fs = $self->{fs};
-    my $mime = $fs->content('mimetype');
+    my $vfs = $self->{vfs};
+    my $mime = $vfs->content('mimetype');
 
     return 0 if ($mime !~ /application\/epub\+zip/i);
 
-    my $container = $fs->content('META-INF/container.xml');
+    my $container = $vfs->content('META-INF/container.xml');
     my($opf_file, $root_path) = ($container =~ /full-path="((.*?)[^\/]+?)"/);
-    my $opf_raw = $fs->content($opf_file);
+    my $opf_raw = $vfs->content($opf_file);
     my $opf = XMLin($opf_raw);
     my %items = %{$opf->{manifest}{item}};
     my @refs = @{$opf->{spine}{itemref}};

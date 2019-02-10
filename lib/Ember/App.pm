@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Cwd qw( realpath );
-use Ember::FS;
+
 use Ember::Book;
 use Ember::Config;
 use Ember::Reader;
@@ -29,7 +29,7 @@ sub new {
 
     $self->{filename} = $filename;
     $self->{chapter} = $args[1];
-    
+
     return bless($self, $class);
 }
 

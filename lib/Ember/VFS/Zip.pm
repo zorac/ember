@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
-package Ember::FS::Zip;
+package Ember::VFS::Zip;
 
 use strict;
 use warnings;
-use base qw( Ember::FS );
+use base qw( Ember::VFS );
 use fields qw( zip members );
 
 use Archive::Zip;
