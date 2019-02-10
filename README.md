@@ -13,3 +13,11 @@ Usage: `ember.pl SomeBook.epub`
 - **b** - previous page
 - **q** - quit
 
+Requires:
+
+- Archive::Zip
+- File::Slurp
+- HTML::FormatText
+- Term::ANSIScreen
+- Term::ReadKey
+- XML::Simple
