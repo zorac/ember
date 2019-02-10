@@ -18,7 +18,7 @@ sub _open {
     eval {
         my $zip = Archive::Zip->new($filename);
         my %members;
-        
+
         foreach my $member ($zip->memberNames()) {
             $members{$member} = 1;
         }
@@ -38,4 +38,3 @@ sub content {
 }
 
 1;
-

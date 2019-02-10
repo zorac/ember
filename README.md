@@ -7,7 +7,7 @@ Ember is a very basic command-line interface to reading eBooks. Features:
 - Supports macOS (tested) and Linux (hopefully), put probably not yet Windows
 - Remembers last position in each book
 
-Usage: `ember.pl SomeBook.epub`
+Usage: `bin/ember SomeBook.epub`
 
 - &lt;space&gt; - next page
 - **b** - previous page
