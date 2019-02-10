@@ -1,5 +1,15 @@
 #!/usr/bin/env perl
 
+=head1 NAME
+
+ember - A CLI-based reader for eBooks.
+
+=head1 SYNOPSIS
+
+ember my_ebook.epub
+
+=cut
+
 use strict;
 use warnings;
 
@@ -11,3 +21,46 @@ use Ember::App;
 my $app = Ember::App->new(@ARGV);
 
 $app->run();
+
+=head1 DESCRIPTION
+
+Ember is a very simple CLI-based reader for eBooks. It will automatically adapt
+to your terminal width, and remembers the last position in each book.
+
+=head2 Key Commands
+
+=over
+
+=item I<spacebar>
+
+Next page
+
+=item b
+
+Previous page
+
+=item q
+
+Quit
+
+=back
+
+=head2 Suppported File Formats
+
+=over
+
+=item ePub
+
+Ember can read ePub files in both zipped and unpacked formats.
+
+=back
+
+=head1 SEE ALSO
+
+L<Ember::App>, L<Ember::Reader>
+
+=head1 AUTHOR
+
+Mark Rigby-Jones <mark@rigby-jones.net>
+
+=cut

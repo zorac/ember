@@ -1,10 +1,46 @@
-#!/usr/bin/perl
-
 package Ember::Config;
+
+=head1 NAME
+
+Ember::Config - Configuration handling for Ember.
+
+=head1 SYNOPSIS
+
+use Ember::Config;
+
+my $config = Ember::Config->open();
+
+=head1 DESCRIPTION
+
+This class handles configuration data for Ember via platform-specific
+subclasses.
+
+=cut
 
 use strict;
 use warnings;
 use fields qw( dir );
+
+=head2 Fields
+
+=over
+
+=item dir
+
+The configuration directory.
+
+=back
+
+=head2 Class Methods
+
+=over
+
+=item new()
+
+Create a configuration instance. Will fail if not called on a subclass; instead
+use the open() method to automatically create the correct object.
+
+=cut
 
 sub new {
     my ($self) = @_;
@@ -13,6 +49,13 @@ sub new {
 
     return $self if ($self->_open());
 }
+
+=item open()
+
+Create and return a confifiguration instance of the appropriate
+platform-specific subclass.
+
+=cut
 
 sub open {
     if ($^O eq 'darwin') {
@@ -27,9 +70,28 @@ sub open {
     }
 }
 
+=back
+
+=head2 Instance Methods
+
+=over
+
+=item _open()
+
+Subclasses must implement this to open the configuration. Should return a true
+value on success.
+
+=cut
+
 sub _open {
     die('Cannot directly instantiate Ember::Config');
 }
+
+=item get_pos($filename)
+
+Fetch the last reading position for a given eBook filename.
+
+=cut
 
 sub get_pos {
     my ($self, $filename) = @_;
@@ -51,6 +113,12 @@ sub get_pos {
 
     return;
 }
+
+=item set_pos($reader)
+
+Save the last reading position for a given eBook reader instance.
+
+=cut
 
 sub save_pos {
     my ($self, $reader) = @_;
@@ -74,7 +142,12 @@ sub save_pos {
     rename($tmp, $file);
 }
 
-# To implement in subclasses:
-# _open() -> bool
+=back
+
+=head1 AUTHOR
+
+Mark Rigby-Jones <mark@rigby-jones.net>
+
+=cut
 
 1;

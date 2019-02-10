@@ -1,13 +1,95 @@
-#!/usr/bin/perl
-
 package Ember::Reader;
+
+=head1 NAME
+
+Ember::Reader - An eBook reader implementation.
+
+=head1 SYNOPSIS
+
+use Ember::Reader;
+
+my $reader = Ember::Reader->new($book);
+
+$reader->run();
+
+=head1 DESCRIPTION
+
+This class impements a reader application for an eBook.
+
+=cut
 
 use strict;
 use warnings;
-use fields qw( book chapter pos width height lines lines_pos line_count page page_size page_count screen );
+use fields qw( book chapter pos width height lines lines_pos line_count page
+                page_size page_count screen );
 
 use Term::ANSIScreen;
 use Term::ReadKey;
+
+=head2 Fields
+
+=over
+
+=item book
+
+The book being read.
+
+=item chapter
+
+The chapter currently being read.
+
+=item pos
+
+The current reading position within the chapter.
+
+=item width
+
+The screen width, in characters.
+
+=item height
+
+The screen height, in characters.
+
+=item lines
+
+The formatted text lines of the current chapter.
+
+=item lines_pos
+
+The reading position corresponding to each line of the chapter.
+
+=item line_count
+
+The number of lines in the current chapter.
+
+=item page
+
+The current page number within the chapter.
+
+=item page_size
+
+The current page size (number of visible lines).
+
+=item page_count
+
+The number of pages in the current chapter/
+
+=item screen
+
+The screen object.
+
+=back
+
+=head2 Class Methods
+
+=over
+
+=item new($book [, $chapter [, $pos]])
+
+Create a reader instance. A book is required, the chapter and reading position
+are optional.
+
+=cut
 
 sub new {
     my ($self, $book, $chapter, $pos) = @_;
@@ -22,6 +104,18 @@ sub new {
 
     return $self;
 }
+
+=back
+
+=head2 Instance Methods
+
+=over
+
+=item run()
+
+Run the reader application until the user exits it.
+
+=cut
 
 sub run {
     my ($self) = @_;
@@ -50,6 +144,12 @@ sub run {
     ReadMode(0); # restore
     print "\n";
 }
+
+=item format()
+
+Format the current chapter for the current screen size.
+
+=cut
 
 sub format {
     my ($self) = @_;
@@ -85,6 +185,12 @@ sub format {
     $self->{page} = $page_count - 1;
 }
 
+=item display()
+
+Display the page at the current reading position.
+
+=cut
+
 sub display {
     my ($self) = @_;
     my $size = $self->{page_size};
@@ -112,6 +218,12 @@ sub display {
     # TODO footer row
 }
 
+=item resize()
+
+Resize the reader to match the current screen size.
+
+=cut
+
 sub resize {
     my ($self) = @_;
     my ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
@@ -126,6 +238,12 @@ sub resize {
     $self->{height} = $hchar;
     $self->display();
 }
+
+=item page_prev()
+
+Go to the previous page.
+
+=cut
 
 sub page_prev() {
     my ($self) = @_;
@@ -144,6 +262,12 @@ sub page_prev() {
         $self->display();
     }
 }
+
+=item page_next()
+
+Go to the next page.
+
+=cut
 
 sub page_next() {
     my ($self) = @_;
@@ -165,5 +289,17 @@ sub page_next() {
         $self->display();
     }
 }
+
+=back
+
+=head1 SEE ALSO
+
+L<ember>, L<Ember::App>, L<Ember::Book>, L<Ember::Chapter>
+
+=head1 AUTHOR
+
+Mark Rigby-Jones <mark@rigby-jones.net>
+
+=cut
 
 1;

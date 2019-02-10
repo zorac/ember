@@ -1,6 +1,14 @@
-#!/usr/bin/perl
-
 package Ember::EPub::Book;
+
+=head1 NAME
+
+Ember::EPub::Book - An EPUB book.
+
+=head1 DESCRIPTION
+
+This class handles EPUB formatted books.
+
+=cut
 
 use strict;
 use warnings;
@@ -11,6 +19,34 @@ use Ember::EPub::Chapter;
 use Ember::Format::HTML;
 use Scalar::Util qw( weaken );
 use XML::Simple;
+
+=head2 Fields
+
+=over
+
+=item manifest
+
+Stores manifest data from the EPUB file.
+
+=item rootpath
+
+The root path within the EPUB file.
+
+=item formatter
+
+The formatter instance used to format chapters.
+
+=back
+
+=head2 Instance Methods
+
+=over
+
+=item _open()
+
+Open an ePub book and parse its metadata.
+
+=cut
 
 sub _open {
     my ($self) = @_;
@@ -65,5 +101,17 @@ sub _open {
 
     return 1;
 }
+
+=back
+
+=head1 SEE ALSO
+
+L<Ember::Book>, L<Ember::EPub::Chapter>
+
+=head1 AUTHOR
+
+Mark Rigby-Jones <mark@rigby-jones.net>
+
+=cut
 
 1;
