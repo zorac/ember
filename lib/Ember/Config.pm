@@ -95,6 +95,7 @@ Fetch the last reading position for a given eBook filename.
 
 sub get_pos {
     my ($self, $filename) = @_;
+    my $qfn = quotemeta($filename);
     my $file = $self->{dir} . '/position.txt';
 
     return unless (-e $file);
@@ -102,7 +103,7 @@ sub get_pos {
     CORE::open(IN, '<', $file);
 
     while (defined(my $line = <IN>)) {
-        if ($line =~ /^$filename\t(.+?)\t(\d+)$/) {
+        if ($line =~ /^$qfn\t(.+?)\t(\d+)$/) {
             my %result = ( chapter => $1, pos => $2 );
             close(IN);
             return %result;
@@ -125,6 +126,7 @@ sub save_pos {
     my $file = $self->{dir} . '/position.txt';
     my $tmp = $self->{dir} . '/position.tmp';
     my $filename = $reader->{book}{filename};
+    my $qfn = quotemeta($filename);
 
     CORE::open(IN, '<', $file);
     CORE::open(OUT, '>', $tmp);
@@ -132,7 +134,7 @@ sub save_pos {
     print OUT $filename, "\t", $reader->{chapter}{path}, "\t", $reader->{pos}, "\n";
 
     while (defined(my $line = <IN>)) {
-        print OUT $line unless ($line =~ /^$filename\t/);
+        print OUT $line unless ($line =~ /^$qfn\t/);
     }
 
     close(OUT);

@@ -25,7 +25,7 @@ Format HTML text into an array of lines with a given maximum length.
 sub format {
     my ($self, $input, $width) = @_;
     my $text = HTML::FormatText->format_string($input,
-        lm => 0, rm => $width - 1);
+        lm => 0, rm => $width - 3);
 
     return split(/\r?\n/, $text);
 }

@@ -155,7 +155,7 @@ sub format {
     my ($self) = @_;
     my $size = $self->{height} - 1;
     my @lines = $self->{chapter}->lines($self->{width});
-    my $page_count = int((@lines + $size - 1) / $size);
+    my $page_count = (@lines == 0) ? 1 : int((@lines + $size - 1) / $size);
     my @lines_pos;
     my $pos = 0;
 
@@ -214,6 +214,7 @@ sub display {
     }
 
     print '-- Page ' . ($self->{page} + 1) . '/' . $self->{page_count};
+    STDOUT->flush();
 
     # TODO footer row
 }
@@ -230,12 +231,12 @@ sub resize {
 
     if ($wchar != $self->{width}) {
         $self->{width} = $wchar;
-        $self->format();
     } elsif ($hchar == $self->{height}) {
         return; # Size not actually changed
     }
 
     $self->{height} = $hchar;
+    $self->format();
     $self->display();
 }
 

@@ -72,7 +72,12 @@ sub content {
     my ($self, $path) = @_;
 
     return unless ($self->{members}{$path});
-    return $self->{zip}->contents($path);
+
+    my $text = $self->{zip}->contents($path);
+
+    utf8::decode($text);
+
+    return $text;
 }
 
 =back
