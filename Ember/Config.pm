@@ -6,8 +6,6 @@ use strict;
 use warnings;
 use fields qw( dir );
 
-use Ember::Config::MacOS; # TODO dynamic loading
-
 sub new {
     my ($self) = @_;
 
@@ -18,10 +16,13 @@ sub new {
 
 sub open {
     if ($^O eq 'darwin') {
+        require Ember::Config::MacOS;
         return Ember::Config::MacOS->new();
     } elsif ($^O eq 'MSWin32') {
+        require Ember::Config::Windows;
         return Ember::Config::Windows->new();
     } else {
+        require Ember::Config::UNIX;
         return Ember::Config::UNIX->new();
     }
 }
