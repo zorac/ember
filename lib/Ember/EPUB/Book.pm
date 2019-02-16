@@ -1,8 +1,8 @@
-package Ember::EPub::Book;
+package Ember::EPUB::Book;
 
 =head1 NAME
 
-Ember::EPub::Book - An EPUB book.
+Ember::EPUB::Book - An EPUB book.
 
 =head1 DESCRIPTION
 
@@ -15,7 +15,7 @@ use warnings;
 use base qw( Ember::Book );
 use fields qw( manifest rootpath formatter );
 
-use Ember::EPub::Chapter;
+use Ember::EPUB::Chapter;
 use Ember::Format::HTML;
 use Scalar::Util qw( weaken );
 use XML::Simple;
@@ -44,7 +44,7 @@ The formatter instance used to format chapters.
 
 =item _open()
 
-Open an ePub book and parse its metadata.
+Open an EPUB book and parse its metadata.
 
 =cut
 
@@ -72,7 +72,7 @@ sub _open {
     }
 
     foreach my $ref (@refs) {
-        my $chapter = Ember::EPub::Chapter->new();
+        my $chapter = Ember::EPUB::Chapter->new();
         my $id = $ref->{idref};
         my $item = $manifest{$id};
         my $skip = $ref->{linear} && ($ref->{linear} eq 'no');
@@ -106,7 +106,7 @@ sub _open {
 
 =head1 SEE ALSO
 
-L<Ember::Book>, L<Ember::EPub::Chapter>
+L<Ember::Book>, L<Ember::EPUB::Chapter>
 
 =head1 AUTHOR
 

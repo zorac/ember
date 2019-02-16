@@ -1,8 +1,8 @@
-package Ember::EPub::Chapter;
+package Ember::EPUB::Chapter;
 
 =head1 NAME
 
-Ember::EPub::Chapter - A chapter of an EPUB book.
+Ember::EPUB::Chapter - A chapter of an EPUB book.
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ sub lines {
 
 =head1 SEE ALSO
 
-L<Ember::Chapter>, L<Ember::EPub::Book>
+L<Ember::Chapter>, L<Ember::EPUB::Book>
 
 =head1 AUTHOR
 

@@ -7,8 +7,8 @@ lib/Ember/Config.pm
 lib/Ember/Config/MacOS.pm
 lib/Ember/Config/UNIX.pm
 lib/Ember/Config/Windows.pm
-lib/Ember/EPub/Book.pm
-lib/Ember/EPub/Chapter.pm
+lib/Ember/EPUB/Book.pm
+lib/Ember/EPUB/Chapter.pm
 lib/Ember/Format.pm
 lib/Ember/Format/HTML.pm
 lib/Ember/Reader.pm

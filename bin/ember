@@ -32,17 +32,21 @@ to your terminal width, and remembers the last position in each book.
 
 =over
 
-=item I<spacebar>
+=item p, I<spacebar>
 
 Next page
 
-=item b
+=item n, b
 
 Previous page
 
+=item r
+
+Refresh screen
+
 =item q
 
-Quit
+Quit Ember
 
 =back
 
@@ -50,15 +54,15 @@ Quit
 
 =over
 
-=item ePub
+=item EPUB
 
-Ember can read ePub files in both zipped and unpacked formats.
+Ember can read EPUB files in both zipped and unpacked formats.
 
 =back
 
 =head1 SEE ALSO
 
-L<Ember::App>, L<Ember::Reader>
+L<Ember>, L<Ember::Reader>
 
 =head1 AUTHOR
 

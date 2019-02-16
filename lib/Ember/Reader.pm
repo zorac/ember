@@ -131,10 +131,12 @@ sub run {
     while (1) {
         my $key = ReadKey(0);
 
-        if ($key eq ' ') {
+        if (($key eq ' ') || ($key eq 'n')) {
             $self->page_next();
-        } elsif ($key eq 'b') {
+        } elsif (($key eq 'b') || ($key eq 'p')) {
             $self->page_prev();
+        } elsif ($key eq 'r') {
+            $self->display();
         } elsif ($key eq 'q') {
             last;
         }

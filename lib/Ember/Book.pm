@@ -23,7 +23,7 @@ use fields qw( filename vfs chapters );
 use Ember::VFS;
 
 my %HINTS = (
-    epub    => 'EPub',
+    epub    => 'EPUB',
 );
 
 =head2 Fields
@@ -81,8 +81,8 @@ sub open {
     $vfs = Ember::VFS->open($vfs) if (!$vfs->isa('Ember::VFS'));
 
     if (1) {
-        require Ember::EPub::Book;
-        return Ember::EPub::Book->new($vfs);
+        require Ember::EPUB::Book;
+        return Ember::EPUB::Book->new($vfs);
     }
 
     # TODO support other formats
