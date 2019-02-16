@@ -10,15 +10,16 @@ ember my_ebook.epub
 
 =cut
 
+use 5.006;
 use strict;
 use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Ember::App;
+use Ember;
 
-my $app = Ember::App->new(@ARGV);
+my $app = Ember->new(@ARGV);
 
 $app->run();
 

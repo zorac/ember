@@ -1,5 +1,12 @@
 .vs*
+/blib
 /calibre
 /ibooks
 /icloud
 *.epub
+/Ember-*
+/Makefile
+/Makefile.old
+/MANIFEST.bak
+/MYMETA.*
+/pm_to_blib

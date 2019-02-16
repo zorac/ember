@@ -1,14 +1,14 @@
-package Ember::App;
+package Ember;
 
 =head1 NAME
 
-Ember::App - A CLI-based reader for eBooks.
+Ember - A CLI-based reader for eBooks.
 
 =head1 SYNOPSIS
 
-use Ember::App;
+use Ember;
 
-my $app = Ember::App->new(@ARGV);
+my $app = Ember->new(@ARGV);
 
 $app->run();
 
@@ -18,6 +18,7 @@ This class is the entrypoint for the Ember application.
 
 =cut
 
+use 5.006;
 use strict;
 use warnings;
 
@@ -26,6 +27,8 @@ use Cwd qw( realpath );
 use Ember::Book;
 use Ember::Config;
 use Ember::Reader;
+
+our $VERSION = '0.02';
 
 =head2 Class Methods
 

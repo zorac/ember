@@ -1,0 +1,27 @@
+bin/ember
+Changes
+lib/Ember.pm
+lib/Ember/App.pm
+lib/Ember/Book.pm
+lib/Ember/Chapter.pm
+lib/Ember/Config.pm
+lib/Ember/Config/MacOS.pm
+lib/Ember/Config/UNIX.pm
+lib/Ember/Config/Windows.pm
+lib/Ember/EPub/Book.pm
+lib/Ember/EPub/Chapter.pm
+lib/Ember/Format.pm
+lib/Ember/Format/HTML.pm
+lib/Ember/Reader.pm
+lib/Ember/VFS.pm
+lib/Ember/VFS/Dir.pm
+lib/Ember/VFS/Zip.pm
+LICENSE.txt
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
