@@ -17,19 +17,19 @@ use base qw( Ember::Config );
 
 use Carp;
 
-=head2 Instance Methods
+=head2 Class Methods
 
 =over
 
-=item _open()
+=item new()
 
-Locate or create the Ember configuration directory within the current user's
-Application Support directory.
+Create a configuration instance using a directory in the user's "Application
+Support" folder directory.
 
 =cut
 
-sub _open {
-    my ($self) = @_;
+sub new {
+    my ($class) = @_;
     my $appsupport = $ENV{HOME} . '/Library/Application Support';
     my $dir = $appsupport . '/Ember';
 
@@ -37,9 +37,9 @@ sub _open {
         unless (-d $appsupport);
     mkdir($dir) unless (-d $dir);
 
-    $self->{dir} = $dir;
+    my $self = $class->SUPER::new($dir);
 
-    return 1;
+    return $self;
 }
 
 =back

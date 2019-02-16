@@ -6,7 +6,8 @@ Ember::Format - Text conversion and formatting.
 
 =head1 DESCRIPTION
 
-Interface for converting raw eBook data into formatted text for CLI display.
+Abstract superclass for objects which convert raw eBook data into formatted
+text for CLI display.
 
 =cut
 

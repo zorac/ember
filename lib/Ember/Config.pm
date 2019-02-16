@@ -12,8 +12,8 @@ my $config = Ember::Config->open();
 
 =head1 DESCRIPTION
 
-This class handles configuration data for Ember via platform-specific
-subclasses.
+This is an abstract superclass for objects which handle configuration data for
+Ember.
 
 =cut
 
@@ -21,8 +21,6 @@ use 5.008;
 use strict;
 use warnings;
 use fields qw( dir );
-
-use Carp;
 
 =head2 Fields
 
@@ -38,18 +36,20 @@ The configuration directory.
 
 =over
 
-=item new()
+=item new($dir)
 
-Create a configuration instance. Will fail if not called on a subclass; instead
-use the open() method to automatically create the correct object.
+Create a configuration instance using the given directory. Normally, you should
+simply use the open() method to create a platform-specific instance.
 
 =cut
 
 sub new {
-    my ($class) = @_;
+    my ($class, $dir) = @_;
     my $self = fields::new($class);
 
-    return $self if ($self->_open());
+    $self->{dir} = $dir;
+
+    return $self;
 }
 
 =item open()
@@ -77,17 +77,6 @@ sub open {
 =head2 Instance Methods
 
 =over
-
-=item _open()
-
-Subclasses must implement this to open the configuration. Should return a true
-value on success.
-
-=cut
-
-sub _open {
-    croak('Cannot directly instantiate Ember::Config');
-}
 
 =item get_pos($filename)
 

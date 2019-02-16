@@ -2,15 +2,11 @@ package Ember::App::Pager;
 
 =head1 NAME
 
-Ember::Pager - An app for paging through content.
-
-=head1 SYNOPSIS
-
-use Ember::Pager;
+Ember::App::Pager - An app for paging through content.
 
 =head1 DESCRIPTION
 
-This class impements a generic pager application.
+Abstract superclass for Ember apps which display paged text.
 
 =cut
 

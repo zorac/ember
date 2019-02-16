@@ -12,7 +12,7 @@ my $vfs = Ember::VFS->open($filename);
 
 =head1 DESCRIPTION
 
-This is the base class for Ember's virtual filesystem layer.
+Abstract superclass for objects which provide a virtual filesystem to Ember.
 
 =cut
 
@@ -44,9 +44,9 @@ The base file or directory name.
 
 =item new($filename)
 
-Create a new virtual filesystem from a given file or directory. Will fail if
-not called on a subclass; instead use the open() method to automatically create
-the correct object.
+Create a new virtual filesystem from a given file or directory. Ueseless unless
+called on a concrete subclass. Normally, you should use the open() method to
+automatically create the correct object.
 
 =cut
 
@@ -56,7 +56,7 @@ sub new {
 
     $self->{filename} = $filename;
 
-    return $self if ($self->_open());
+    return $self;
 }
 
 =item open($filename)
@@ -85,19 +85,6 @@ sub open {
 =back
 
 =head2 Instance Methods
-
-=over
-
-=item _open()
-
-Subclasses must implement this to open the file or directory. Should return a
-true value on success.
-
-=cut
-
-sub _open {
-    croak('Cannot directly instantiate Ember::VFS');
-}
 
 =item content($path)
 

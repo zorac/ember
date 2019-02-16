@@ -15,19 +15,20 @@ use strict;
 use warnings;
 use base qw( Ember::Config );
 
-=head2 Instance Methods
+use Carp;
+
+=head2 Class Methods
 
 =over
 
-=item _open()
+=item new()
 
-Locate or create the Ember configuration directory within the current user's
-TODO!
+Create a configuration instance using a directory... somewhere.
 
 =cut
 
-sub _open {
-    return 0;
+sub new {
+    croak('Windows is not yet supported.')
 }
 
 =back

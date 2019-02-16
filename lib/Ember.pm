@@ -8,9 +8,9 @@ Ember - A CLI-based reader for eBooks.
 
 use Ember;
 
-my $app = Ember->new(@ARGV);
+my $ember = Ember->new(@ARGV);
 
-$app->run();
+$ember->run();
 
 =head1 DESCRIPTION
 

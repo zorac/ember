@@ -12,7 +12,8 @@ my $book = Ember::Book->open($vfs);
 
 =head1 DESCRIPTION
 
-This class handles opening eBooks and retrieving chapters and other details.
+This is an abstract superclass for objects which handle opening eBooks and
+retrieving their chapters and other details.
 
 =cut
 
@@ -53,9 +54,9 @@ An array of L<Ember::Chapter> objects contained within this book.
 
 =item new($vfs)
 
-Create a new Book instance with data from a supplied VFS instance. Will fail if
-called on this class directly, rathen than a subclass. Normally, you should
-simply use the open() method to detect the correct format.
+Create a new Book instance with data from a supplied VFS instance. Useless
+unless called an a concrete subclass. Normally, you should simply use the
+open() method to detect the correct format.
 
 =cut
 
@@ -67,7 +68,7 @@ sub new {
     $self->{filename} = $vfs->{filename};
     $self->{chapters} = [];
 
-    return $self if ($self->_open());
+    return $self;
 }
 
 =item open($vfs)
@@ -97,17 +98,6 @@ sub open {
 =head2 Instance Methods
 
 =over
-
-=item _open()
-
-Must be implemented by subclasses to open the book. Should return a true value
-on success.
-
-=cut
-
-sub _open {
-    croak('Cannot directly instantiate Ember::Book');
-}
 
 =item chapter([$name_or_id])
 

@@ -6,7 +6,7 @@ Ember::Format::HTML - HTML conversion and formatting.
 
 =head1 DESCRIPTION
 
-This class converts HTML files into plain text.
+This formatter converts HTML files into plain text.
 
 =cut
 

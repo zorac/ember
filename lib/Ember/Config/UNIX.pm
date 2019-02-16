@@ -15,26 +15,26 @@ use strict;
 use warnings;
 use base qw( Ember::Config );
 
-=head2 Instance Methods
+=head2 Class Methods
 
 =over
 
-=item _open()
+=item new()
 
-Locate or create the Ember configuration directory within the current user's
-home directory.
+Create a configuration instance using a ".ember" directory in the user's home
+directory.
 
 =cut
 
-sub _open {
-    my ($self) = @_;
+sub new {
+    my ($class) = @_;
     my $dir = $ENV{HOME} . '/.ember';
 
     mkdir($dir) unless (-d $dir);
 
-    $self->{dir} = $dir;
+    my $self = $class->SUPER::new($dir);
 
-    return 1;
+    return $self;
 }
 
 =back

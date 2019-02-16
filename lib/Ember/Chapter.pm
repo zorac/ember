@@ -6,7 +6,8 @@ Ember::Chapter - A chapter of a book.
 
 =head1 DESCRIPTION
 
-This class represents a chapter within a book.
+This is an abstract superclass for objects which represent a chapter within a
+book.
 
 =cut
 
@@ -16,6 +17,7 @@ use warnings;
 use fields qw( id path mime skip book prev next );
 
 use Carp;
+use Scalar::Util qw( weaken );
 
 =head2 Fields
 
@@ -55,15 +57,35 @@ A weak link to the next chapter.
 
 =over
 
-=item new()
+=item new($args)
 
-Create a new chapter.
+Create a new chapter. All fields are settable, and should not be set otherwise.
+Setting prev/next will automatically set the reverse relationship.
 
 =cut
 
 sub new {
-    my ($class) = @_;
+    my ($class, $args) = @_;
     my $self = fields::new($class);
+    my $book = $args->{book};
+    my $prev = $args->{prev};
+    my $next = $args->{next};
+
+    $self->{id} = $args->{id};
+    $self->{path} = $args->{path};
+    $self->{mime} = $args->{mime};
+    $self->{skip} = $args->{skip} ? 1 : 0;
+    weaken($self->{book} = $book) if ($book);
+
+    if ($prev) {
+        weaken($self->{prev} = $prev);
+        weaken($prev->{next} = $self);
+    }
+
+    if ($next) {
+        weaken($self->{next} = $next);
+        weaken($next->{prev} = $self);
+    }
 
     return $self;
 }

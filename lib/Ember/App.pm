@@ -2,17 +2,12 @@ package Ember::App;
 
 =head1 NAME
 
-Ember::App - Superclass for Ember Apps.
-
-=head1 SYNOPSIS
-
-use Ember::App;
-
-# TODO?
+Ember::App - An app within Ember, such as a book reader.
 
 =head1 DESCRIPTION
 
-This class impements a reader application for an eBook.
+This is an abstract superclass for apps. An app is something which renders
+screens within Ember, and accepts input via keypresses.
 
 =cut
 
@@ -47,7 +42,7 @@ The screen width, in characters.
 
 =item new($args)
 
-Create a new application. Should be called on a subclass to get a usable app.
+Create a new app. Should be called on a concrete subclass to get a usable app.
 Settable fields: screen (required).
 
 =cut

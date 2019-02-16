@@ -11,27 +11,39 @@ directory.
 
 =cut
 
+use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::VFS );
 
 use File::Slurp;
 
-=head2 Instance Methods
+=head2 Class Methods
 
 =over
 
-=item _open()
+=item new($filename)
 
-Simply checks whether the base filname is indeed a directory.
+Create a new VFS from a directory. Returns undefined if the specified path is
+not a directory.
 
 =cut
 
-sub _open {
-    my ($self) = @_;
+sub new {
+    my ($class, $filename) = @_;
 
-    return -d $self->{filename};
+    return undef if (!-d $filename);
+
+    my $self = $class->SUPER::new($filename);
+
+    return $self;
 }
+
+=back
+
+=head2 Instance Methods
+
+=over
 
 =item content($path)
 

@@ -10,6 +10,7 @@ This VFS implementation exposes the contents of a zip archive.
 
 =cut
 
+use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::VFS );
@@ -31,21 +32,23 @@ Enumerates the members of the zip archive.
 
 =back
 
-=head2 Instance Methods
+=head2 Class Methods
 
 =over
 
-=item _open()
+=item new($filename)
 
-Checks if the base filename is indeed a zip archive, and enumeates its members.
+Create a new VFS from a zip file, and enumerate its members. Returns undefined
+if the specified file is not a zip archive.
 
 =cut
 
-sub _open {
-    my ($self) = @_;
-    my $filename = $self->{filename};
+sub new {
+    my ($class, $filename) = @_;
 
-    return 0 if (!-f $filename);
+    return undef if (!-f $filename);
+
+    my $self = $class->SUPER::new($filename);
 
     eval {
         my $zip = Archive::Zip->new($filename);
@@ -59,8 +62,14 @@ sub _open {
         $self->{members} = \%members;
     };
 
-    return $self->{members} ? 1 : 0;
+    return $self->{members} ? $self : undef;
 }
+
+=back
+
+=head2 Instance Methods
+
+=over
 
 =item content($path)
 

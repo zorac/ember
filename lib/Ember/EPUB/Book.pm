@@ -16,7 +16,6 @@ use warnings;
 use base qw( Ember::Book );
 use fields qw( manifest rootpath formatter );
 
-use Scalar::Util qw( weaken );
 use XML::Simple;
 
 use Ember::EPUB::Chapter;
@@ -40,23 +39,24 @@ The formatter instance used to format chapters.
 
 =back
 
-=head2 Instance Methods
+=head2 Class Methods
 
 =over
 
-=item _open()
+=item new($vfs)
 
-Open an EPUB book and parse its metadata.
+Open an EPUB book and parse its metadata. Returns undefined if the VFS does not
+contain an EPUB book.
 
 =cut
 
-sub _open {
-    my ($self) = @_;
-    my $vfs = $self->{vfs};
+sub new {
+    my ($class, $vfs) = @_;
     my $mime = $vfs->content('mimetype');
 
-    return 0 if ($mime !~ /application\/epub\+zip/i);
+    return undef if (!$mime || ($mime !~ /application\/epub\+zip/i));
 
+    my $self = $class->SUPER::new($vfs);
     my $container = $vfs->content('META-INF/container.xml');
     my($opf_file, $root_path) = ($container =~ /full-path="((.*?)[^\/]+?)"/);
     my $opf_raw = $vfs->content($opf_file);
@@ -74,21 +74,17 @@ sub _open {
     }
 
     foreach my $ref (@refs) {
-        my $chapter = Ember::EPUB::Chapter->new();
         my $id = $ref->{idref};
         my $item = $manifest{$id};
         my $skip = $ref->{linear} && ($ref->{linear} eq 'no');
-
-        $chapter->{id} = $id;
-        $chapter->{path} = $item->{file};
-        $chapter->{mime} = $item->{mime};
-        $chapter->{skip} = 1 if ($skip);
-        weaken($chapter->{book} = $self);
-
-        if ($prev) {
-            weaken($chapter->{prev} = $prev);
-            weaken($prev->{next} = $chapter);
-        }
+        my $chapter = Ember::EPUB::Chapter->new({
+            id => $id,
+            path => $item->{file},
+            mime => $item->{mime},
+            skip => $skip,
+            book => $self,
+            prev => $prev,
+        });
 
         $prev = $chapter;
         push(@chapters, $chapter);
@@ -101,7 +97,7 @@ sub _open {
     $self->{rootpath} = $root_path;
     $self->{formatter} = Ember::Format::HTML->new();
 
-    return 1;
+    return $self;
 }
 
 =back
