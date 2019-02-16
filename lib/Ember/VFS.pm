@@ -16,9 +16,12 @@ This is the base class for Ember's virtual filesystem layer.
 
 =cut
 
+use 5.008;
 use strict;
 use warnings;
 use fields qw( filename );
+
+use Carp;
 
 my %HINTS = (
     epub    => 'Zip',
@@ -48,9 +51,9 @@ the correct object.
 =cut
 
 sub new {
-    my ($self, $filename) = @_;
+    my ($class, $filename) = @_;
+    my $self = fields::new($class);
 
-    $self = fields::new($self) unless (ref($self));
     $self->{filename} = $filename;
 
     return $self if ($self->_open());
@@ -76,7 +79,7 @@ sub open {
 
     # TODO use hints, check all...
 
-    die('Unable to determine VFS type')
+    croak('Unable to determine VFS type')
 }
 
 =back
@@ -93,7 +96,7 @@ true value on success.
 =cut
 
 sub _open {
-    die('Cannot directly instantiate Ember::VFS');
+    croak('Cannot directly instantiate Ember::VFS');
 }
 
 =item content($path)
@@ -104,7 +107,7 @@ within the virtual filesystem.
 =cut
 
 sub content {
-    die('Sub-class has not implemented content()');
+    croak('Sub-class has not implemented content()');
 }
 
 =back

@@ -10,6 +10,7 @@ This class converts HTML files into plain text.
 
 =cut
 
+use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::Format );

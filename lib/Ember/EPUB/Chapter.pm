@@ -10,6 +10,7 @@ This class represents a chapter within an EPUB book.
 
 =cut
 
+use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::Chapter );

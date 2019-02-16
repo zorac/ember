@@ -10,9 +10,12 @@ This class represents a chapter within a book.
 
 =cut
 
+use 5.008;
 use strict;
 use warnings;
 use fields qw( id path mime skip book prev next );
+
+use Carp;
 
 =head2 Fields
 
@@ -59,9 +62,8 @@ Create a new chapter.
 =cut
 
 sub new {
-    my ($self) = @_;
-
-    $self = fields::new($self) unless (ref($self));
+    my ($class) = @_;
+    my $self = fields::new($class);
 
     return $self;
 }
@@ -80,7 +82,7 @@ chapter, restricted to a given display width in characters.
 =cut
 
 sub lines {
-    die('Sub-class has not implemented lines()');
+    croak('Sub-class has not implemented lines()');
 }
 
 =back

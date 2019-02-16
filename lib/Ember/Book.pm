@@ -16,9 +16,12 @@ This class handles opening eBooks and retrieving chapters and other details.
 
 =cut
 
+use 5.008;
 use strict;
 use warnings;
 use fields qw( filename vfs chapters );
+
+use Carp;
 
 use Ember::VFS;
 
@@ -57,12 +60,11 @@ simply use the open() method to detect the correct format.
 =cut
 
 sub new {
-    my ($self, $vfs) = @_;
-    my $filename = $vfs->{filename};
+    my ($class, $vfs) = @_;
+    my $self = fields::new($class);
 
-    $self = fields::new($self) unless (ref($self));
     $self->{vfs} = $vfs;
-    $self->{filename} = $filename;
+    $self->{filename} = $vfs->{filename};
     $self->{chapters} = [];
 
     return $self if ($self->_open());
@@ -87,7 +89,7 @@ sub open {
 
     # TODO support other formats
 
-    die('Unable to determine format');
+    croak('Unable to determine format');
 }
 
 =back
@@ -104,7 +106,7 @@ on success.
 =cut
 
 sub _open {
-    die('Cannot directly instantiate Ember::Book');
+    croak('Cannot directly instantiate Ember::Book');
 }
 
 =item chapter([$name_or_id])

@@ -10,14 +10,18 @@ ember my_ebook.epub
 
 =cut
 
-use 5.006;
+use 5.008;
 use strict;
-use warnings;
+use warnings FATAL => 'all', NONFATAL => 'redefine';
 
+use Carp qw( cluck confess verbose );
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use Ember;
+
+$SIG{__DIE__} = \&confess;
+$SIG{__WARN__} = \&cluck;
 
 my $app = Ember->new(@ARGV);
 

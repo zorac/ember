@@ -18,17 +18,21 @@ This class is the entrypoint for the Ember application.
 
 =cut
 
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
+use fields qw( app config screen );
 
+use Carp;
 use Cwd qw( realpath );
+use Term::ANSIScreen;
+use Term::ReadKey;
 
 use Ember::Book;
 use Ember::Config;
-use Ember::Reader;
+use Ember::App::Reader;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head2 Class Methods
 
@@ -42,9 +46,8 @@ for details on supported arguments.
 =cut
 
 sub new {
-    my ($this, @args) = @_;
-    my $class = ref($this) || $this;
-    my $self = {};
+    my ($class, @args) = @_;
+    my $self = fields::new($class);
 
     # TODO better arg parsing & usage
 
@@ -56,14 +59,27 @@ EOF
     }
 
     my $filename = realpath($args[0]);
+    my $chapter = $args[1];
 
-    die('Unable to locate requested file')
+    croak('Unable to locate requested file')
         unless ($filename && -e $filename);
 
-    $self->{filename} = $filename;
-    $self->{chapter} = $args[1];
+    $self->{config} = Ember::Config->open();
+    $self->{screen} = Term::ANSIScreen->new();
 
-    return bless($self, $class);
+    my $book = Ember::Book->open($filename);
+    my %pos = $chapter ? ( chapter => $chapter )
+        : $self->{config}->get_pos($filename);
+    my $reader = Ember::App::Reader->new({
+        screen => $self->{screen},
+        book => $book,
+        chapter => $pos{chapter},
+        pos => $pos{pos}
+    });
+
+    $self->{app} = $reader;
+
+    return $self;
 }
 
 =back
@@ -80,26 +96,47 @@ Run the reader application.
 
 sub run {
     my ($self) = @_;
-    my $config = Ember::Config->open();
-    my $book = Ember::Book->open($self->{filename});
-    my %pos = $self->{chapter} ? ( chapter => $self->{chapter} )
-        : $config->get_pos($self->{filename});
-
-    my $reader = Ember::Reader->new($book, $pos{chapter}, $pos{pos});
 
     binmode(STDOUT, ':utf8');
+    ReadMode(3); # noecho
+    $self->resize;
+    $SIG{WINCH} = sub { $self->resize() };
 
-    $reader->run;
-    $config->save_pos($reader);
+    while (1) {
+        my $key = ReadKey(0);
+        my ($command, @args) = $self->{app}->keypress($key);
 
-    # TODO menu, save pos, etc, etc
+        if (!defined($command)) {
+            next;
+        } elsif ($command eq 'quit') {
+            last;
+        } # TODO menu, save pos, etc, etc
+    }
+
+    $SIG{WINCH} = undef;
+    $self->{config}->save_pos($self->{app}); # TODO make this generic
+    ReadMode(0); # restore
+    print "\n"
+}
+
+=item resize()
+
+Resize the displayed app to match the current screen size.
+
+=cut
+
+sub resize {
+    my ($self) = @_;
+    my ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
+
+    $self->{app}->display($wchar, $hchar);
 }
 
 =back
 
 =head1 SEE ALSO
 
-L<ember>, L<Ember::Book>, L<Ember::Config>, L<Ember::Reader>
+L<ember>, L<Ember::Book>, L<Ember::Config>, L<Ember::App::Reader>
 
 =head1 AUTHOR
 

@@ -10,9 +10,12 @@ Interface for converting raw eBook data into formatted text for CLI display.
 
 =cut
 
+use 5.008;
 use strict;
 use warnings;
 use fields;
+
+use Carp;
 
 =head2 Class Methods
 
@@ -26,9 +29,8 @@ an object which is actually useful.
 =cut
 
 sub new {
-    my ($self) = @_;
-
-    $self = fields::new($self) unless (ref($self));
+    my ($class) = @_;
+    my $self = fields::new($class);
 
     return $self;
 }
@@ -47,7 +49,7 @@ restricted to a given display width in characters.
 =cut
 
 sub format {
-    die('Sub-class has not implemented format()');
+    croak('Sub-class has not implemented format()');
 }
 
 =back

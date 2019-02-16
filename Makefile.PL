@@ -1,4 +1,4 @@
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -10,12 +10,13 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/Ember.pm',
     LICENSE             => 'artistic_2',
     EXE_FILES           => [ 'bin/ember' ],
-    MIN_PERL_VERSION    => '5.006',
+    MIN_PERL_VERSION    => '5.008',
     TEST_REQUIRES => {
         'Test::More' => '0',
     },
     PREREQ_PM => {
         'Archive::Zip'      => '0',
+        'Carp'              => '0',
         'Cwd'               => '0',
         'File::Slurp'       => '0',
         'FindBin'           => '0',

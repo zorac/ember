@@ -10,15 +10,17 @@ This class handles EPUB formatted books.
 
 =cut
 
+use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::Book );
 use fields qw( manifest rootpath formatter );
 
-use Ember::EPUB::Chapter;
-use Ember::Format::HTML;
 use Scalar::Util qw( weaken );
 use XML::Simple;
+
+use Ember::EPUB::Chapter;
+use Ember::Format::HTML;
 
 =head2 Fields
 

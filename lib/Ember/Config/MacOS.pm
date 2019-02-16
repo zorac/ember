@@ -10,9 +10,12 @@ This class handles configuration data for Ember on Apple macOS.
 
 =cut
 
+use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::Config );
+
+use Carp;
 
 =head2 Instance Methods
 
@@ -30,7 +33,8 @@ sub _open {
     my $appsupport = $ENV{HOME} . '/Library/Application Support';
     my $dir = $appsupport . '/Ember';
 
-    die('Failed to locate Application Support folder') unless (-d $appsupport);
+    croak('Failed to locate Application Support folder')
+        unless (-d $appsupport);
     mkdir($dir) unless (-d $dir);
 
     $self->{dir} = $dir;

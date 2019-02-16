@@ -10,6 +10,7 @@ This class handles configuration data for Ember on Microsoft Windows.
 
 =cut
 
+use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::Config );

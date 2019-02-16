@@ -17,9 +17,12 @@ subclasses.
 
 =cut
 
+use 5.008;
 use strict;
 use warnings;
 use fields qw( dir );
+
+use Carp;
 
 =head2 Fields
 
@@ -43,9 +46,8 @@ use the open() method to automatically create the correct object.
 =cut
 
 sub new {
-    my ($self) = @_;
-
-    $self = fields::new($self) unless (ref($self));
+    my ($class) = @_;
+    my $self = fields::new($class);
 
     return $self if ($self->_open());
 }
@@ -84,7 +86,7 @@ value on success.
 =cut
 
 sub _open {
-    die('Cannot directly instantiate Ember::Config');
+    croak('Cannot directly instantiate Ember::Config');
 }
 
 =item get_pos($filename)
