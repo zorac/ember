@@ -14,8 +14,6 @@ use strict;
 use warnings;
 use base qw( Ember::Config );
 
-=back
-
 =head2 Instance Methods
 
 =over

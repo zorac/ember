@@ -16,7 +16,11 @@ use base qw( Ember::Format );
 
 use HTML::FormatText;
 
-=item lines($input, $width)
+=head2 Instance Methods
+
+=over
+
+=item format($input, $width)
 
 Format HTML text into an array of lines with a given maximum length.
 

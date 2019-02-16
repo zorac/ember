@@ -1,7 +1,6 @@
 bin/ember
 Changes
 lib/Ember.pm
-lib/Ember/App.pm
 lib/Ember/Book.pm
 lib/Ember/Chapter.pm
 lib/Ember/Config.pm
@@ -18,7 +17,7 @@ lib/Ember/VFS/Dir.pm
 lib/Ember/VFS/Zip.pm
 LICENSE.txt
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 MANIFEST.SKIP
 README.md
 t/00-load.t

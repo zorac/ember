@@ -11,16 +11,16 @@ WriteMakefile(
     LICENSE             => 'artistic_2',
     EXE_FILES           => [ 'bin/ember' ],
     MIN_PERL_VERSION    => '5.006',
-    CONFIGURE_REQUIRES  => {
-        'ExtUtils::MakeMaker' => '0',
-    },
-    BUILD_REQUIRES => {
+    TEST_REQUIRES => {
         'Test::More' => '0',
     },
     PREREQ_PM => {
         'Archive::Zip'      => '0',
+        'Cwd'               => '0',
         'File::Slurp'       => '0',
+        'FindBin'           => '0',
         'HTML::FormatText'  => '0',
+        'Scalar::Util'      => '0',
         'Term::ANSIScreen'  => '0',
         'Term::ReadKey'     => '0',
         'XML::Simple'       => '0',

@@ -14,6 +14,17 @@ use strict;
 use warnings;
 use fields;
 
+=head2 Class Methods
+
+=over
+
+=item new($filename)
+
+Create a new formatter. You should call this directly on a subclass if you want
+an object which is actually useful.
+
+=cut
+
 sub new {
     my ($self) = @_;
 
@@ -28,15 +39,15 @@ sub new {
 
 =over
 
-=item lines($input, $width)
+=item format($input, $width)
 
 Must be implemented by sub-classes to format text lines for the given input,
 restricted to a given display width in characters.
 
 =cut
 
-sub lines {
-    die('Sub-class has not implemented lines()');
+sub format {
+    die('Sub-class has not implemented format()');
 }
 
 =back

@@ -115,7 +115,7 @@ sub get_pos {
     return;
 }
 
-=item set_pos($reader)
+=item save_pos($reader)
 
 Save the last reading position for a given eBook reader instance.
 
