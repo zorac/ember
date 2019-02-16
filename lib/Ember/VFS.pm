@@ -86,6 +86,8 @@ sub open {
 
 =head2 Instance Methods
 
+=over
+
 =item content($path)
 
 Must be implemented by sub-classes to fetch the file content at a given path

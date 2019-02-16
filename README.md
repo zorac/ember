@@ -4,7 +4,7 @@ Ember is a very basic command-line interface to reading eBooks. Features:
 
 - Supports EPUB format ebooks (tested with generic and iBooks-purchased)
 - Handles books in single-file or uncompressed formats
-- Supports macOS (tested) and Linux (hopefully), put probably not yet Windows
+- Supports macOS (tested) and Linux (hopefully), but not yet Windows
 - Remembers last position in each book
 
 ## Installation

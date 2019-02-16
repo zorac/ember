@@ -1,5 +1,8 @@
 Revision history for Ember
 
+0.03    16th February 2019
+        Refactoring to enable future functionality.
+
 0.02    16th February 2019
         Fixes, cleanup, documentation, and packaging.
 

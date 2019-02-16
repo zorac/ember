@@ -1,6 +1,9 @@
 bin/ember
 Changes
 lib/Ember.pm
+lib/Ember/App.pm
+lib/Ember/App/Pager.pm
+lib/Ember/App/Reader.pm
 lib/Ember/Book.pm
 lib/Ember/Chapter.pm
 lib/Ember/Config.pm
@@ -11,7 +14,6 @@ lib/Ember/EPUB/Book.pm
 lib/Ember/EPUB/Chapter.pm
 lib/Ember/Format.pm
 lib/Ember/Format/HTML.pm
-lib/Ember/Reader.pm
 lib/Ember/VFS.pm
 lib/Ember/VFS/Dir.pm
 lib/Ember/VFS/Zip.pm
