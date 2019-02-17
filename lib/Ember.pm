@@ -32,7 +32,6 @@ use Ember::Book;
 use Ember::Config;
 use Ember::App::Reader;
 
-our $VERSION = '0.03';
 our $VERSION = '0.04';
 
 =head2 Fields

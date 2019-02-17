@@ -117,7 +117,7 @@ sub page_prev() {
         if ($chapter) {
             $self->{chapter} = $chapter;
             $self->{pos} = -1;
-            $self->layout();
+            $self->layout(1);
             $self->render();
         }
     } else {
@@ -140,7 +140,7 @@ sub page_next() {
         if ($chapter) {
             $self->{chapter} = $chapter;
             $self->{pos} = 0;
-            $self->layout();
+            $self->layout(1);
             $self->render();
         }
     } else {
