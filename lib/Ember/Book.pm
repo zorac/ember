@@ -20,13 +20,29 @@ retrieving their chapters and other details.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( filename vfs chapters );
+use fields qw( filename vfs metadata chapters );
 
 use Carp;
 
 use Ember::VFS;
 
-my %HINTS = (
+our @METADATA = (
+    [ title         => 'Title',         ''      ],
+    [ title_sort    => 'Title Sort',    'hide'  ],
+    [ authors       => 'Author',        'array' ],
+    [ author_sort   => 'Author Sort',   'hide'  ],
+    [ series        => 'Series',        ''      ],
+    [ series_index  => 'In Series',     ''      ],
+    [ publisher     => 'Publisher',     ''      ],
+    [ date          => 'Date',          ''      ],
+    [ copyright     => 'Copyright',     ''      ],
+    [ language      => 'Language',      ''      ],
+    [ generator     => 'Generator',     ''      ],
+    [ ids           => 'IDs',           'hash'  ],
+    [ description   => 'Description',   'multi' ],
+);
+
+our %HINTS = (
     epub    => 'EPUB',
 );
 
@@ -41,6 +57,10 @@ The filename for this book.
 =item vfs
 
 The L<Ember::VFS> instance providing the data for this book.
+
+=item metadata
+
+Metadata about this book.
 
 =item chapters
 
@@ -66,6 +86,7 @@ sub new {
 
     $self->{vfs} = $vfs;
     $self->{filename} = $vfs->{filename};
+    $self->{metadata} = {};
     $self->{chapters} = [];
 
     return $self;
