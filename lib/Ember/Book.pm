@@ -146,6 +146,44 @@ sub chapter {
     return $first;
 }
 
+=item display_metadata()
+
+Fetch display metadata for this book. Returns ( [ 'Key' => 'Value' ] ... ).
+
+=cut
+
+sub display_metadata {
+    my ($self) = @_;
+    my $metadata = $self->{metadata};
+    my @meta;
+
+    foreach my $row (@METADATA) {
+        my ($key, $name, $hint) = @{$row};
+        my $value = $metadata->{$key};
+
+        next if (!$value || ($hint eq 'hide'));
+
+        if ($hint eq 'array') {
+            $name .= 's' if (@{$value} > 1);
+            push(@meta, [ $name, $value->[0] ]);
+
+            for (my $i = 1; $i < @{$value}; $i++) {
+                push(@meta, [ '', $value->[$i] ]);
+            }
+        } elsif ($hint eq 'hash') {
+            foreach my $hkey (sort(keys(%{$value}))) {
+                push(@meta, [ $hkey, $value->{$hkey} ]);
+            }
+        } elsif ($hint eq 'multi') {
+            push(@meta, [ undef, $value ]);
+        } else {
+            push(@meta, [ $name, $value ]);
+        }
+    }
+
+    return @meta;
+}
+
 =back
 
 =head1 SEE ALSO

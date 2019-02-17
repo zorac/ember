@@ -2,6 +2,7 @@ bin/ember
 Changes
 lib/Ember.pm
 lib/Ember/App.pm
+lib/Ember/App/Metadata.pm
 lib/Ember/App/Pager.pm
 lib/Ember/App/Reader.pm
 lib/Ember/Book.pm

@@ -22,6 +22,8 @@ use warnings;
 use base qw( Ember::App::Pager );
 use fields qw( book chapter );
 
+use Ember::App::Metadata;
+
 =head2 Fields
 
 =over
@@ -79,6 +81,25 @@ sub layout {
 
     # Let Pager handle the rest.
     $self->SUPER::layout();
+}
+
+=item keypress($key)
+
+Handle a keypress for displaying book information.
+
+=cut
+
+sub keypress {
+    my ($self, $key) = @_;
+
+    if ($key eq 'i') {
+        return 'push', Ember::App::Metadata->new({
+            screen => $self->{screen},
+            book => $self->{book},
+        });
+    } else {
+        return $self->SUPER::keypress($key);
+    }
 }
 
 =item page_prev()

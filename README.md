@@ -21,6 +21,7 @@ are supported to navigate the applcation:
 
 - **n**, ***space*** - next page
 - **p**,  **b** - previous page
+- **i** - view book info
 - **r** - refresh screen
 - **q** - quit
 
