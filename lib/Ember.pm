@@ -21,7 +21,7 @@ This class is the entrypoint for the Ember application.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( app config screen );
+use fields qw( config screen app stack );
 
 use Carp;
 use Cwd qw( realpath );
@@ -33,6 +33,29 @@ use Ember::Config;
 use Ember::App::Reader;
 
 our $VERSION = '0.03';
+our $VERSION = '0.04';
+
+=head2 Fields
+
+=over
+
+=item config
+
+A configuration instance.
+
+=item screen
+
+The screen object used to display Ember.
+
+=item app
+
+The currently displayed app.
+
+=item stack
+
+The stack of displayed apps.
+
+=back
 
 =head2 Class Methods
 
@@ -78,6 +101,7 @@ EOF
     });
 
     $self->{app} = $reader;
+    $self->{stack} = [ $reader ];
 
     return $self;
 }
@@ -99,8 +123,8 @@ sub run {
 
     binmode(STDOUT, ':utf8');
     ReadMode(3); # noecho
-    $self->resize;
-    $SIG{WINCH} = sub { $self->resize() };
+    $self->display();
+    $SIG{WINCH} = sub { $self->display() };
 
     while (1) {
         my $key = ReadKey(0);
@@ -108,6 +132,21 @@ sub run {
 
         if (!defined($command)) {
             next;
+        } elsif ($command eq 'push') {
+            my $app = $args[0]; # TODO check?
+
+            push(@{$self->{stack}}, $app);
+            $self->{app} = $app;
+            $self->display();
+        } elsif ($command eq 'pop') {
+            my $stack = $self->{stack};
+            my $count = @{$stack};
+
+            last if ($count == 1);
+
+            pop(@{$stack});
+            $self->{app} = $stack->[$count - 2];
+            $self->display();
         } elsif ($command eq 'quit') {
             last;
         } # TODO menu, save pos, etc, etc
@@ -119,13 +158,13 @@ sub run {
     print "\n"
 }
 
-=item resize()
+=item display()
 
-Resize the displayed app to match the current screen size.
+Display the current app at the current screen size.
 
 =cut
 
-sub resize {
+sub display {
     my ($self) = @_;
     my ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
 

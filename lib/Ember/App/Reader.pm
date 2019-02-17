@@ -8,7 +8,7 @@ Ember::Reader - An eBook reader implementation.
 
 use Ember::App::Reader;
 
-my $reader = Ember::App::Reader->new($book);
+my $reader = Ember::App::Reader->new({ screen => $screen, book => $book });
 
 =head1 DESCRIPTION
 

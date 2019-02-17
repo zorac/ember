@@ -14,17 +14,13 @@ screens within Ember, and accepts input via keypresses.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( height screen width );
+use fields qw( screen width height );
 
 use Carp;
 
 =head2 Fields
 
 =over
-
-=item height
-
-The screen height, in characters.
 
 =item screen
 
@@ -33,6 +29,10 @@ The Term::ANSIScreen object this app should be displayed within.
 =item width
 
 The screen width, in characters.
+
+=item height
+
+The screen height, in characters.
 
 =back
 
@@ -124,7 +124,7 @@ sub keypress {
     if ($key eq 'r') {
         $self->render();
     } elsif ($key eq 'q') {
-        return 'quit';
+        return 'pop';
     }
 }
 
