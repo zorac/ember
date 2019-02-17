@@ -21,14 +21,14 @@ use HTML::FormatText;
 
 =over
 
-=item format($input, $width)
+=item format($width, $input)
 
 Format HTML text into an array of lines with a given maximum length.
 
 =cut
 
 sub format {
-    my ($self, $input, $width) = @_;
+    my ($self, $width, $input) = @_;
     my $text = HTML::FormatText->format_string($input,
         lm => 0, rm => $width - 3);
 

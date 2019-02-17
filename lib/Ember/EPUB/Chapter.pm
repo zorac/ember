@@ -32,7 +32,7 @@ sub lines {
     my $path = $book->{rootpath} . $self->{path};
     my $content = $book->{vfs}->content($path);
 
-    return $book->{formatter}->format($content, $width);
+    return $book->{formatter}->format($width, $content);
 }
 
 =back

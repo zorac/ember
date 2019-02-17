@@ -22,7 +22,7 @@ use Carp;
 
 =over
 
-=item new($filename)
+=item new()
 
 Create a new formatter. You should call this directly on a subclass if you want
 an object which is actually useful.
@@ -42,7 +42,7 @@ sub new {
 
 =over
 
-=item format($input, $width)
+=item format($width, $input)
 
 Must be implemented by sub-classes to format text lines for the given input,
 restricted to a given display width in characters.
