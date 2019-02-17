@@ -82,9 +82,11 @@ sub new {
 
 =over
 
-=item layout()
+=item layout($width_changed, $height_changed)
 
-Layout the content for the current screen size.
+Layout the content for the current screen size. Subclasses should normally
+regenerate $self->{lines} (only if the width has changed), and then call:
+    $self->SUPER::layout();
 
 =cut
 

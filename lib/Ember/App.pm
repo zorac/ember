@@ -72,23 +72,24 @@ Display the app within the screen.
 
 sub display {
     my ($self, $width, $height) = @_;
-    my $resized = 0;
+    my $wchange = 0;
+    my $hchange = 0;
 
     if ($width != $self->{width}) {
         $self->{width} = $width;
-        $resized = 1;
+        $wchange = 1;
     }
 
     if ($height != $self->{height}) {
         $self->{height} = $height;
-        $resized = 1;
+        $hchange = 1;
     }
 
-    $self->layout if ($resized);
-    $self->render;
+    $self->layout($wchange, $hchange) if ($wchange || $hchange);
+    $self->render();
 }
 
-=item layout()
+=item layout($width_changed, $height_changed)
 
 Layout the screen for initial display, or after a resize. To be implemented by
 subclasses.

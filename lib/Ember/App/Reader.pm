@@ -65,21 +65,21 @@ sub new {
 
 =over
 
-=item layout()
+=item layout($width_changed, $height_changed)
 
 Layout the current chapter for the current screen size.
 
 =cut
 
 sub layout {
-    my ($self) = @_;
+    my ($self, $width_changed) = @_;
 
-    # Generate the lines for the current chapter.
-    my @lines = $self->{chapter}->lines($self->{width});
+    if ($width_changed) {
+        my @lines = $self->{chapter}->lines($self->{width});
 
-    $self->{lines} = \@lines;
+        $self->{lines} = \@lines;
+    }
 
-    # Let Pager handle the rest.
     $self->SUPER::layout();
 }
 

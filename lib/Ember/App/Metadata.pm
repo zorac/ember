@@ -85,26 +85,30 @@ sub new {
 
 =over
 
-=item layout()
+=item layout($width_changed, $height_changed)
 
 Layout the metadata for the current screen size.
 
 =cut
 
 sub layout {
-    my ($self) = @_;
-    my $width = $self->{width};
-    my $table = $self->{table};
-    my $text = $self->{text};
-    my @lines;
+    my ($self, $width_changed) = @_;
 
-    push(@lines, $self->{table_formatter}->format($width, $table)) if ($table);
-    push(@lines, '') if ($table && $text);
-    push(@lines, $self->{text_formatter}->format($width, $text)) if ($text);
+    if ($width_changed) {
+        my $width = $self->{width};
+        my $table = $self->{table};
+        my $text = $self->{text};
+        my @lines;
 
-    $self->{lines} = \@lines;
+        push(@lines, $self->{table_formatter}->format($width, $table))
+            if ($table);
+        push(@lines, '') if ($table && $text);
+        push(@lines, $self->{text_formatter}->format($width, $text))
+            if ($text);
 
-    # Let Pager handle the rest.
+        $self->{lines} = \@lines;
+    }
+
     $self->SUPER::layout();
 }
 
