@@ -22,6 +22,7 @@ use warnings;
 use base qw( Ember::App::Pager );
 use fields qw( book chapter );
 
+use Ember::App::Contents;
 use Ember::App::Metadata;
 
 =head2 Fields
@@ -92,7 +93,12 @@ Handle a keypress for displaying book information.
 sub keypress {
     my ($self, $key) = @_;
 
-    if ($key eq 'i') {
+    if ($key eq 'c') {
+        return 'push', Ember::App::Contents->new({
+            screen => $self->{screen},
+            book => $self->{book},
+        });
+    } elsif ($key eq 'i') {
         return 'push', Ember::App::Metadata->new({
             screen => $self->{screen},
             book => $self->{book},
