@@ -14,7 +14,7 @@ book.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( id path mime skip book prev next );
+use fields qw( id title path mime skip book prev next );
 
 use Carp;
 use Scalar::Util qw( weaken );
@@ -26,6 +26,10 @@ use Scalar::Util qw( weaken );
 =item id
 
 A unique ID for this chapter.
+
+=item title
+
+This chapter's title.
 
 =item path
 
@@ -72,6 +76,7 @@ sub new {
     my $next = $args->{next};
 
     $self->{id} = $args->{id};
+    $self->{title} = $args->{title};
     $self->{path} = $args->{path};
     $self->{mime} = $args->{mime};
     $self->{skip} = $args->{skip} ? 1 : 0;

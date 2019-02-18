@@ -64,7 +64,7 @@ sub new {
     my $opf = XMLin($opf_raw);
     my %items = %{$opf->{manifest}{item}};
     my @refs = @{$opf->{spine}{itemref}};
-    my(%manifest, @chapters, $prev, %metain, %metaout);
+    my(%manifest, %titles, @chapters, $prev, %metain, %metaout);
 
     foreach my $id (keys(%items)) {
         $manifest{$id} = {
@@ -74,12 +74,24 @@ sub new {
         };
     }
 
+    if ($opf->{spine}{toc}) {
+        my $ncx_file = $root_path . $manifest{$opf->{spine}{toc}}{file};
+        my $ncx_raw = $vfs->content($ncx_file);
+        my $ncx = XMLin($ncx_raw);
+        my $navs = $ncx->{navMap}{navPoint};
+
+        foreach my $nav (values(%{$navs})) {
+            $titles{$nav->{content}{src}} = $nav->{navLabel}{text};
+        }
+    }
+
     foreach my $ref (@refs) {
         my $id = $ref->{idref};
         my $item = $manifest{$id};
         my $skip = $ref->{linear} && ($ref->{linear} eq 'no');
         my $chapter = Ember::EPUB::Chapter->new({
             id => $id,
+            title => $titles{$item->{file}},
             path => $item->{file},
             mime => $item->{mime},
             skip => $skip,
