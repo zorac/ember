@@ -141,8 +141,8 @@ sub render {
     $last = $self->{line_count} if ($last > $self->{line_count});
 
     $self->{pos} = $self->{lines_pos}[$first];
-    $self->{screen}->Cls();
-    $self->{screen}->Cursor(0, 0);
+    $self->{screen}->clear_screen();
+    $self->{screen}->move_to(1, 1);
 
     for (; $line < $last; $line++) {
         print $self->{lines}[$line], "\n";

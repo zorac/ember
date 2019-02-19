@@ -124,7 +124,7 @@ sub keypress {
 
     if ($key eq 'r') {
         $self->render();
-    } elsif ($key eq 'q') {
+    } elsif (($key eq 'q') || ($key eq 'esc')) {
         return 'pop';
     }
 }

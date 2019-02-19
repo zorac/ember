@@ -25,12 +25,11 @@ use fields qw( config screen app stack );
 
 use Carp;
 use Cwd qw( realpath );
-use Term::ANSIScreen;
-use Term::ReadKey;
 
+use Ember::App::Reader;
 use Ember::Book;
 use Ember::Config;
-use Ember::App::Reader;
+use Ember::Screen;
 
 our $VERSION = '0.04';
 
@@ -87,7 +86,7 @@ EOF
         unless ($filename && -e $filename);
 
     $self->{config} = Ember::Config->open();
-    $self->{screen} = Term::ANSIScreen->new();
+    $self->{screen} = Ember::Screen->new();
 
     my $book = Ember::Book->open($filename);
     my %pos = $chapter ? ( chapter => $chapter )
@@ -120,13 +119,11 @@ Run the reader application.
 sub run {
     my ($self) = @_;
 
-    binmode(STDOUT, ':utf8');
-    ReadMode(3); # noecho
     $self->display();
     $SIG{WINCH} = sub { $self->display() };
 
     while (1) {
-        my $key = ReadKey(0);
+        my $key = $self->{screen}->read_key();
         my ($command, @args) = $self->{app}->keypress($key);
 
         if (!defined($command)) {
@@ -153,7 +150,6 @@ sub run {
 
     $SIG{WINCH} = undef;
     $self->{config}->save_pos($self->{app}); # TODO make this generic
-    ReadMode(0); # restore
     print "\n"
 }
 
@@ -165,9 +161,9 @@ Display the current app at the current screen size.
 
 sub display {
     my ($self) = @_;
-    my ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
+    my ($width, $height) = $self->{screen}->get_size();
 
-    $self->{app}->display($wchar, $hchar);
+    $self->{app}->display($width, $height);
 }
 
 =back
