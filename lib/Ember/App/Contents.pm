@@ -20,7 +20,7 @@ use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::App::Pager );
-use fields qw( table formatter );
+use fields qw( ids table formatter input );
 
 use Ember::Format::KeyValue;
 
@@ -51,13 +51,17 @@ Create a new table of contents viewer. Settable fields: book (required).
 sub new {
     my ($class, $args) = @_;
     my $self = $class->SUPER::new($args);
-    my @table;
+    my (@ids, @table);
     my $i = 1;
 
     foreach my $chapter (@{$args->{book}{chapters}}) {
-        push(@table, [ $i++ => $chapter->{title} ]);
+        next if ($chapter->{skip});
+        $ids[$i] = $chapter->{id};
+        push(@table, [ $i => $chapter->{title} ]);
+        $i++;
     }
 
+    $self->{ids} = \@ids;
     $self->{table} = \@table;
     $self->{formatter} = Ember::Format::KeyValue->new();
 
@@ -86,6 +90,50 @@ sub layout {
     }
 
     $self->SUPER::layout();
+}
+
+=item keypress($key)
+
+Handle keypresses to perform chapter selection.
+
+=cut
+
+sub keypress {
+    my ($self, $key) = @_;
+    my $input = $self->{input};
+
+    if ($key =~ /^\d$/) {
+        $input = defined($input) ? "$input$key" : $key;
+        $self->{input} = $input;
+        $self->footer("Go to: $input", 1);
+    } elsif ($key eq 'bs') {
+        if (defined($input)) {
+            my $len = length($input);
+
+            if ($len <= 1) {
+                $self->{input} = undef;
+                $self->footer(undef, 0);
+            } else{
+                $input = substr($input, 0, $len - 1);
+                $self->{input} = $input;
+                $self->footer("Go to: $input", 1);
+            }
+        }
+    } elsif (($key eq 'esc') && defined($input)) {
+        $self->{input} = undef;
+        $self->footer(undef, 0);
+    } elsif (($key eq "\n") && defined($input)) {
+        my $id = $self->{ids}[$input];
+
+        if (defined($id)) {
+            return 'pop', 'chapter', $id;
+        } else {
+            $self->{input} = undef;
+            $self->footer("Unknown chapter number: $input", 0);
+        }
+    } else {
+        return $self->SUPER::keypress($key);
+    }
 }
 
 =back

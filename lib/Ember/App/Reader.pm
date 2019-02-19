@@ -73,9 +73,9 @@ Layout the current chapter for the current screen size.
 =cut
 
 sub layout {
-    my ($self, $width_changed) = @_;
+    my ($self, $changed) = @_;
 
-    if ($width_changed) {
+    if ($changed) {
         my @lines = $self->{chapter}->lines($self->{width});
 
         $self->{lines} = \@lines;
@@ -105,6 +105,26 @@ sub keypress {
         });
     } else {
         return $self->SUPER::keypress($key);
+    }
+}
+
+=item command($command, @args)
+
+Receive a command from another app.
+
+=cut
+
+sub command {
+    my ($self, $command, @args) = @_;
+
+    if ($command eq 'chapter') {
+        my $chapter = $self->{book}->chapter(shift(@args));
+
+        if (defined($chapter)) {
+            $self->{chapter} = $chapter;
+            $self->{pos} = 0;
+            $self->layout(1); # TODO mark as dirty instead?
+        }
     }
 }
 
