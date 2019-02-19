@@ -129,6 +129,18 @@ sub keypress {
     }
 }
 
+=item command($command, @args)
+
+Receive a command from another app.
+
+=cut
+
+sub command {
+    my ($self, $command, @args) = @_;
+
+    # No global commands defined
+}
+
 =back
 
 =head1 SEE ALSO

@@ -129,7 +129,7 @@ sub run {
         if (!defined($command)) {
             next;
         } elsif ($command eq 'push') {
-            my $app = $args[0]; # TODO check?
+            my $app = shift(@args); # TODO check?
 
             push(@{$self->{stack}}, $app);
             $self->{app} = $app;
@@ -142,6 +142,7 @@ sub run {
 
             pop(@{$stack});
             $self->{app} = $stack->[$count - 2];
+            $self->{app}->command(@args) if (@args);
             $self->display();
         } elsif ($command eq 'quit') {
             last;
