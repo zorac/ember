@@ -31,7 +31,7 @@ use Ember::Book;
 use Ember::Config;
 use Ember::Screen;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head2 Fields
 

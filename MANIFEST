@@ -2,6 +2,7 @@ bin/ember
 Changes
 lib/Ember.pm
 lib/Ember/App.pm
+lib/Ember/App/Contents.pm
 lib/Ember/App/Metadata.pm
 lib/Ember/App/Pager.pm
 lib/Ember/App/Reader.pm
@@ -17,6 +18,7 @@ lib/Ember/Format.pm
 lib/Ember/Format/HTML.pm
 lib/Ember/Format/KeyValue.pm
 lib/Ember/Format/Text.pm
+lib/Ember/Screen.pm
 lib/Ember/VFS.pm
 lib/Ember/VFS/Dir.pm
 lib/Ember/VFS/Zip.pm
