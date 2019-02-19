@@ -14,7 +14,8 @@ use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::App );
-use fields qw( pos lines lines_pos line_count page page_size page_count );
+use fields qw( pos lines lines_pos line_count page page_size page_count
+        footer );
 
 =head2 Fields
 
@@ -47,6 +48,10 @@ The current page size (number of visible lines).
 =item page_count
 
 The number of pages in the content.
+
+=item footer
+
+Persistent footer text, if any.
 
 =back
 
@@ -136,7 +141,6 @@ sub render {
     my $last = $self->{page} * $size;
     my $first = $last - $size;
     my $end = $last;
-    my $line = $first;
 
     $last = $self->{line_count} if ($last > $self->{line_count});
 
@@ -144,18 +148,11 @@ sub render {
     $self->{screen}->clear_screen();
     $self->{screen}->move_to(1, 1);
 
-    for (; $line < $last; $line++) {
+    for (my $line = $first; $line < $last; $line++) {
         print $self->{lines}[$line], "\n";
     }
 
-    for (; $line < $end; $line++) {
-        print "\n";
-    }
-
-    print '-- Page ' . $self->{page} . '/' . $self->{page_count};
-    STDOUT->flush();
-
-    # TODO footer row
+    $self->footer();
 }
 
 =item keypress($key)
@@ -174,6 +171,36 @@ sub keypress {
     } else {
         return $self->SUPER::keypress($key);
     }
+}
+
+=item footer([ $text [, $persist ] ])
+
+Display the given text in the footer, or the default footer if empty/undefined.
+If the persist flag is set, the text should be kept until the persist flag is
+explicitly set off.
+
+=cut
+
+sub footer() {
+    my ($self, $text, $persist) = @_;
+
+    if ($persist) {
+        $self->{footer} = $text;
+    } elsif (defined($persist)) {
+        $self->{footer} = undef;
+    }
+
+    if (!defined($text)) {
+        if (defined($self->{footer})) {
+            $text = $self->{footer};
+        } else {
+            $text = '-- Page ' . $self->{page} . '/' . $self->{page_count};
+        }
+    }
+
+    $self->{screen}->move_to(1, $self->{height});
+    printf('%-' . $self->{width} . 's', $text);
+    STDOUT->flush();
 }
 
 =item page_prev()
