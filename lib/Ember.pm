@@ -26,10 +26,10 @@ use fields qw( config screen app stack );
 use Carp;
 use Cwd qw( realpath );
 
-use Ember::App::Reader;
 use Ember::Book;
 use Ember::Config;
 use Ember::Screen;
+use Ember::Util;
 
 our $VERSION = '0.05';
 
@@ -77,7 +77,7 @@ sub new {
 Usage: $0 <eBook filename> [<chapter name>]
 EOF
         exit(1);
-    }
+   }
 
     my $filename = realpath($args[0]);
     my $chapter = $args[1];
@@ -87,15 +87,11 @@ EOF
 
     $self->{config} = Ember::Config->open();
     $self->{screen} = Ember::Screen->new();
+    $self->{stack} = [];
 
     my $book = Ember::Book->open($filename, $self->{config});
-    my $reader = Ember::App::Reader->new({
-        screen => $self->{screen},
-        book => $book
-    });
 
-    $self->{app} = $reader;
-    $self->{stack} = [ $reader ];
+    $self->push_app('Reader', { book => $book });
 
     return $self;
 }
@@ -125,21 +121,14 @@ sub run {
         if (!defined($command)) {
             next;
         } elsif ($command eq 'push') {
-            my $app = shift(@args); # TODO check?
-
-            push(@{$self->{stack}}, $app);
-            $self->{app} = $app;
+            $self->push_app(@args);
             $self->display();
         } elsif ($command eq 'pop') {
-            my $stack = $self->{stack};
-            my $count = @{$stack};
+            my $app = $self->pop_app();
 
-            $self->{app}->close();
-            last if ($count == 1);
+            last if (!$app);
 
-            my $app = pop(@{$stack});
-            $self->{app} = $stack->[$count - 2];
-            $self->{app}->command(@args) if (@args);
+            $app->command(@args) if (@args);
             $self->display();
         } elsif ($command eq 'quit') {
             foreach my $app (@{$self->{stack}}) {
@@ -165,6 +154,55 @@ sub display {
     my ($width, $height) = $self->{screen}->get_size();
 
     $self->{app}->display($width, $height);
+}
+
+=item push_app($name [, $args])
+
+Push an app onto the stack and return it.
+
+=cut
+
+sub push_app {
+    my ($self, $name, $args) = @_;
+    my $class = get_class('App', $name);
+
+    $args = {} if (!$args);
+    $args->{config} = $self->{config};
+    $args->{screen} = $self->{screen};
+
+    my $app = $class->new($args);
+
+    push(@{$self->{stack}}, $app);
+    $self->{app} = $app;
+
+    return $app;
+}
+
+=item pop_app()
+
+Pop the top app off the stack and return the new top app.
+
+=cut
+
+sub pop_app {
+    my ($self) = @_;
+    my $stack = $self->{stack};
+    my $count = @{$stack};
+
+    return if ($count == 0);
+
+    my $app = pop(@{$stack});
+
+    $app->close();
+
+    if ($count == 1) {
+        $self->{app} = undef;
+    } else {
+        $app = $stack->[$count - 2];
+        $self->{app} = $app;
+
+        return $app;
+    }
 }
 
 =back

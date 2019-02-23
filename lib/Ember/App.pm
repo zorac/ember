@@ -14,11 +14,9 @@ screens within Ember, and accepts input via keypresses.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( screen width height );
+use fields qw( config screen width height );
 
 use Carp;
-
-use Ember::App::Help;
 
 =head2 Fields
 
@@ -26,7 +24,11 @@ use Ember::App::Help;
 
 =item screen
 
-The Term::ANSIScreen object this app should be displayed within.
+The L<Ember::Config> instance this app should use.
+
+=item screen
+
+The L<Term::ANSIScreen> object this app should be displayed within.
 
 =item width
 
@@ -45,7 +47,7 @@ The screen height, in characters.
 =item new($args)
 
 Create a new app. Should be called on a concrete subclass to get a usable app.
-Settable fields: screen (required).
+Settable fields: config, screen (both required).
 
 =cut
 
@@ -53,6 +55,7 @@ sub new {
     my ($class, $args) = @_;
     my $self = fields::new($class);
 
+    $self->{config} = $args->{config};
     $self->{screen} = $args->{screen};
     $self->{width} = 0;
     $self->{height} = 0;
@@ -129,10 +132,7 @@ sub keypress {
     } elsif (($key eq 'q') || ($key eq 'esc')) {
         return 'pop';
     } elsif ($key eq 'h') {
-        return 'push', Ember::App::Help->new({
-            screen => $self->{screen},
-            app => $self,
-        });
+        return 'push', 'Help', { app => $self };
     }
 }
 
