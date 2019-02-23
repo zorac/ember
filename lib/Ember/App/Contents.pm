@@ -136,6 +136,38 @@ sub keypress {
     }
 }
 
+=item help_text()
+
+Provides brief details of the table of contents.
+
+=cut
+
+sub help_text {
+    my ($self) = @_;
+
+    return <<'EOF';
+This screen displays the table of contents the currently selected book.
+Type a chapter number and press enter to jump directly to that chapter.
+EOF
+}
+
+=item help_keys()
+
+Return help on the supported keypresses for the application.
+
+=cut
+
+sub help_keys {
+    my ($self) = @_;
+    my $keys = $self->SUPER::help_keys();
+
+    push(@{$keys},
+        [ '1-9...' => 'Type a chapter number' ],
+    );
+
+    return $keys;
+}
+
 =back
 
 =head1 SEE ALSO

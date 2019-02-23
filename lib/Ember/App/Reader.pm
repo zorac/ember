@@ -108,6 +108,41 @@ sub keypress {
     }
 }
 
+=item help_text()
+
+Provides brief details of the reader screen.
+
+=cut
+
+sub help_text {
+    my ($self) = @_;
+
+    return <<'EOF';
+This screen displays the contents of the currently selected book. You can go to
+the next page by hitting the spacebar, and go back by pressing 'B'. Press 'I'
+to view information about the book, and 'C' to view the table of contents,
+which also allows you to jump directly to any chapter.
+EOF
+}
+
+=item help_keys()
+
+Return help on the supported keypresses for the application.
+
+=cut
+
+sub help_keys {
+    my ($self) = @_;
+    my $keys = $self->SUPER::help_keys();
+
+    push(@{$keys},
+        [ I => 'Display information about this book' ],
+        [ C => 'View the table of contents' ],
+    );
+
+    return $keys;
+}
+
 =item command($command, @args)
 
 Receive a command from another app.

@@ -18,6 +18,8 @@ use fields qw( screen width height );
 
 use Carp;
 
+use Ember::App::Help;
+
 =head2 Fields
 
 =over
@@ -126,6 +128,11 @@ sub keypress {
         $self->render();
     } elsif (($key eq 'q') || ($key eq 'esc')) {
         return 'pop';
+    } elsif ($key eq 'h') {
+        return 'push', Ember::App::Help->new({
+            screen => $self->{screen},
+            app => $self,
+        });
     }
 }
 
@@ -139,6 +146,34 @@ sub command {
     my ($self, $command, @args) = @_;
 
     # No global commands defined
+}
+
+=item help_text()
+
+Return any helpful text for the application.
+
+=cut
+
+sub help_text {
+    my ($self) = @_;
+
+    return undef; # No global help text defined
+}
+
+=item help_keys()
+
+Return help on the supported keypresses for the application.
+
+=cut
+
+sub help_keys {
+    my ($self) = @_;
+
+    return [
+        [ 'Escape, Q' => 'Go back to the previous screen, or quit Ember' ],
+        [ R => 'Refresh the screen' ],
+        [ H => 'Display this help' ],
+    ];
 }
 
 =back

@@ -36,28 +36,32 @@ to your terminal width, and remembers the last position in each book.
 
 =over
 
-=item n, I<spacebar>
+=item N, I<Space>
 
 Go to the next page.
 
-=item p, b
+=item P, B
 
 Go to the previous page.
 
-=item i
+=item I
 
 Display book information.
 
-=item c
+=item C
 
 Display table of contents; type a chapter number and press enter to jump to
 that chapter.
 
-=item r
+=item R
 
 Refresh the screen.
 
-=item q, I<escape>
+=item H
+
+Display help about the current screen.
+
+=item Q, I<Escape>
 
 Exit to previous screen, or quit Ember.
 

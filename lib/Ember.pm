@@ -123,7 +123,7 @@ sub run {
     $SIG{WINCH} = sub { $self->display() };
 
     while (1) {
-        my $key = $self->{screen}->read_key();
+        my $key = lc($self->{screen}->read_key());
         my ($command, @args) = $self->{app}->keypress($key);
 
         if (!defined($command)) {

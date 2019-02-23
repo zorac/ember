@@ -3,6 +3,7 @@ Changes
 lib/Ember.pm
 lib/Ember/App.pm
 lib/Ember/App/Contents.pm
+lib/Ember/App/Help.pm
 lib/Ember/App/Metadata.pm
 lib/Ember/App/Pager.pm
 lib/Ember/App/Reader.pm

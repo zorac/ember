@@ -112,6 +112,20 @@ sub layout {
     $self->SUPER::layout();
 }
 
+=item help_text()
+
+Provides brief details of the metadata screen.
+
+=cut
+
+sub help_text {
+    my ($self) = @_;
+
+    return <<'EOF';
+This screen displays information about the currently selected book.
+EOF
+}
+
 =back
 
 =head1 SEE ALSO

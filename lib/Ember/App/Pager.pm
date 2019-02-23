@@ -173,6 +173,24 @@ sub keypress {
     }
 }
 
+=item help_keys()
+
+Return help on the supported keypresses for the application.
+
+=cut
+
+sub help_keys {
+    my ($self) = @_;
+    my $keys = $self->SUPER::help_keys();
+
+    unshift(@{$keys},
+        [ 'Space, N' => 'Go to the next page' ],
+        [ 'P, B' => 'Go back to the previous page' ],
+    );
+
+    return $keys;
+}
+
 =item footer([ $text [, $persist ] ])
 
 Display the given text in the footer, or the default footer if empty/undefined.
