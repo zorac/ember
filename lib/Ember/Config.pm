@@ -25,6 +25,8 @@ use fields qw( dir json );
 use File::Slurp;
 use JSON;
 
+use Ember::Util;
+
 =head2 Fields
 
 =over
@@ -68,16 +70,18 @@ platform-specific subclass.
 =cut
 
 sub open {
+    my ($class) = @_;
+    my $os = 'UNIX';
+
     if ($^O eq 'darwin') {
-        require Ember::Config::MacOS;
-        return Ember::Config::MacOS->new();
+        $os = 'MacOS';
     } elsif ($^O eq 'MSWin32') {
-        require Ember::Config::Windows;
-        return Ember::Config::Windows->new();
-    } else {
-        require Ember::Config::UNIX;
-        return Ember::Config::UNIX->new();
+        $os = 'Windows';
     }
+
+    $class = get_class('Config', $os);
+
+    return $class->new();
 }
 
 =back

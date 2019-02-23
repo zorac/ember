@@ -24,6 +24,7 @@ use fields qw( id filename vfs config metadata chapters is_new );
 
 use Carp;
 
+use Ember::Util;
 use Ember::VFS;
 
 our @METADATA = (
@@ -121,20 +122,22 @@ format and generate an object of the required subclass.
 sub open {
     my ($class, $filename, $config) = @_;
     my $vfs = Ember::VFS->open($filename);
+    my $format;
 
     if (1) {
-        require Ember::EPUB::Book;
-
-        my $book = Ember::EPUB::Book->new({ vfs => $vfs, config => $config });
-
-        $book->save_metadata() if ($book->{is_new});
-
-        return $book;
+        $format = 'EPUB';
     }
 
-    # TODO support other formats
+    $class = get_class($format, 'Book');
 
-    croak('Unable to determine format');
+    my $book = $class->new({ vfs => $vfs, config => $config });
+
+    $book->save_metadata() if ($book->{is_new});
+
+    return $book;
+
+    # TODO support other formats
+    # croak('Unable to determine format');
 }
 
 =back

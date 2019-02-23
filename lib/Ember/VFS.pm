@@ -23,6 +23,8 @@ use fields qw( filename );
 
 use Carp;
 
+use Ember::Util;
+
 my %HINTS = (
     epub    => 'Zip',
     zip     => 'Zip',
@@ -68,18 +70,20 @@ or directory name.
 
 sub open {
     my ($class, $filename) = @_;
+    my $type;
 
     if (-d $filename) {
-        require Ember::VFS::Dir;
-        return Ember::VFS::Dir->new($filename)
+        $type = 'Dir';
     } else {
-        require Ember::VFS::Zip;
-        return Ember::VFS::Zip->new($filename);
+        $type = 'Zip';
     }
 
-    # TODO use hints, check all...
+    $class = get_class('VFS', $type);
 
-    croak('Unable to determine VFS type')
+    return $class->new($filename);
+
+    # TODO use hints, check all...
+    # croak('Unable to determine VFS type')
 }
 
 =back
