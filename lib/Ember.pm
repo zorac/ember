@@ -138,6 +138,7 @@ sub run {
             my $stack = $self->{stack};
             my $count = @{$stack};
 
+            $self->{app}->close();
             last if ($count == 1);
 
             pop(@{$stack});
@@ -145,6 +146,10 @@ sub run {
             $self->{app}->command(@args) if (@args);
             $self->display();
         } elsif ($command eq 'quit') {
+            foreach my $app (@{$self->{stack}}) {
+                $app->close();
+            }
+
             last;
         } # TODO menu, save pos, etc, etc
     }

@@ -176,6 +176,18 @@ sub help_keys {
     ];
 }
 
+=item close()
+
+Signals that this app is to be closed and should save its state.
+
+=cut
+
+sub close {
+    my ($self) = @_;
+
+    # Does nothing
+}
+
 =back
 
 =head1 SEE ALSO
