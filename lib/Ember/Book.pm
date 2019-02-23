@@ -20,7 +20,7 @@ retrieving their chapters and other details.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( filename vfs metadata chapters );
+use fields qw( id filename vfs config metadata chapters );
 
 use Carp;
 
@@ -50,6 +50,10 @@ our %HINTS = (
 
 =over
 
+=item id
+
+Ember's internal ID for the book.
+
 =item filename
 
 The filename for this book.
@@ -57,6 +61,10 @@ The filename for this book.
 =item vfs
 
 The L<Ember::VFS> instance providing the data for this book.
+
+=item config
+
+An Ember configuration instance.
 
 =item metadata
 
@@ -72,41 +80,45 @@ An array of L<Ember::Chapter> objects contained within this book.
 
 =over
 
-=item new($vfs)
+=item new($args)
 
-Create a new Book instance with data from a supplied VFS instance. Useless
-unless called an a concrete subclass. Normally, you should simply use the
-open() method to detect the correct format.
+Create a new Book instance. Required args: 'vfs', 'config'. Useless unless
+called an a concrete subclass. Normally, you should simply use the open()
+method to detect the correct format.
 
 =cut
 
 sub new {
-    my ($class, $vfs) = @_;
+    my ($class, $args) = @_;
     my $self = fields::new($class);
+    my $vfs = $args->{vfs};
+    my $filename = $vfs->{filename};
+    my $config = $args->{config};
 
+    $self->{config} = $config;
     $self->{vfs} = $vfs;
-    $self->{filename} = $vfs->{filename};
+    $self->{id} = $config->get_id($filename);
+    $self->{filename} = $filename;
     $self->{metadata} = {};
     $self->{chapters} = [];
 
     return $self;
 }
 
-=item open($vfs)
+=item open($filename, $config)
 
-Open a book from a given VFS instance. This will attempt to detected the file
+Open a book from a given filename. This will attempt to detected the file
 format and generate an object of the required subclass.
 
 =cut
 
 sub open {
-    my ($class, $vfs) = @_;
-
-    $vfs = Ember::VFS->open($vfs) if (!$vfs->isa('Ember::VFS'));
+    my ($class, $filename, $config) = @_;
+    my $vfs = Ember::VFS->open($filename);
 
     if (1) {
         require Ember::EPUB::Book;
-        return Ember::EPUB::Book->new($vfs);
+        return Ember::EPUB::Book->new({ vfs => $vfs, config => $config });
     }
 
     # TODO support other formats
@@ -144,6 +156,31 @@ sub chapter {
     }
 
     return $first;
+}
+
+=item get_pos()
+
+Fetch the current chapter and reading position for this book.
+
+=cut
+
+sub get_pos {
+    my ($self) = @_;
+    my ($id, $pos) = $self->{config}->get_pos($self->{id});
+
+    return $self->chapter($id), $pos || 0
+}
+
+=item save_pos($chapter, $pos)
+
+Save the current chapter and position for this book.
+
+=cut
+
+sub save_pos {
+    my ($self, $chapter, $pos) = @_;
+
+    return $self->{config}->save_pos($self->{id}, $chapter->{path}, $pos); # TODO
 }
 
 =item display_metadata()

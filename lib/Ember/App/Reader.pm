@@ -45,17 +45,19 @@ The chapter currently being read.
 
 =item new($args)
 
-Create a reader instance. Settable fields: book (required), chapter (optional,
-passed as name/id).
+Create a reader instance. Settable fields: book (required)
 
 =cut
 
 sub new {
     my ($class, $args) = @_;
     my $self = $class->SUPER::new($args);
+    my $book = $args->{book};
+    my ($chapter, $pos) = $book->get_pos();
 
-    $self->{book} = $args->{book};
-    $self->{chapter} = $self->{book}->chapter($args->{chapter});
+    $self->{book} = $book;
+    $self->{chapter} = $chapter;
+    $self->{pos} = $pos;
 
     return $self;
 }
@@ -207,6 +209,18 @@ sub page_next() {
     } else {
         $self->SUPER::page_next();
     }
+}
+
+=item close()
+
+Save the current reading position.
+
+=cut
+
+sub close {
+    my ($self) = @_;
+
+    $self->{book}->save_pos($self->{chapter}, $self->{pos});
 }
 
 =back

@@ -43,7 +43,7 @@ The formatter instance used to format chapters.
 
 =over
 
-=item new($vfs)
+=item new($args)
 
 Open an EPUB book and parse its metadata. Returns undefined if the VFS does not
 contain an EPUB book.
@@ -51,12 +51,13 @@ contain an EPUB book.
 =cut
 
 sub new {
-    my ($class, $vfs) = @_;
+    my ($class, $args) = @_;
+    my $vfs = $args->{vfs};
     my $mime = $vfs->content('mimetype');
 
     return undef if (!$mime || ($mime !~ /application\/epub\+zip/i));
 
-    my $self = $class->SUPER::new($vfs);
+    my $self = $class->SUPER::new($args);
     my $formatter = Ember::Format::HTML->new();
     my $container = $vfs->content('META-INF/container.xml');
     my($opf_file, $root_path) = ($container =~ /full-path="((.*?)[^\/]+?)"/);

@@ -88,14 +88,10 @@ EOF
     $self->{config} = Ember::Config->open();
     $self->{screen} = Ember::Screen->new();
 
-    my $book = Ember::Book->open($filename);
-    my %pos = $chapter ? ( chapter => $chapter )
-        : $self->{config}->get_pos($filename);
+    my $book = Ember::Book->open($filename, $self->{config});
     my $reader = Ember::App::Reader->new({
         screen => $self->{screen},
-        book => $book,
-        chapter => $pos{chapter},
-        pos => $pos{pos}
+        book => $book
     });
 
     $self->{app} = $reader;
@@ -141,7 +137,7 @@ sub run {
             $self->{app}->close();
             last if ($count == 1);
 
-            pop(@{$stack});
+            my $app = pop(@{$stack});
             $self->{app} = $stack->[$count - 2];
             $self->{app}->command(@args) if (@args);
             $self->display();
@@ -155,8 +151,7 @@ sub run {
     }
 
     $SIG{WINCH} = undef;
-    $self->{config}->save_pos($self->{app}); # TODO make this generic
-    print "\n"
+    print STDERR "\n"
 }
 
 =item display()
