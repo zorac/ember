@@ -31,7 +31,7 @@ use Ember::Config;
 use Ember::Screen;
 use Ember::Util;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head2 Fields
 
@@ -72,26 +72,23 @@ sub new {
 
     # TODO better arg parsing & usage
 
-    if (@args == 0) {
-        print <<"EOF";
-Usage: $0 <eBook filename> [<chapter name>]
-EOF
-        exit(1);
-   }
-
-    my $filename = realpath($args[0]);
-    my $chapter = $args[1];
-
-    croak('Unable to locate requested file')
-        unless ($filename && -e $filename);
-
     $self->{config} = Ember::Config->open();
     $self->{screen} = Ember::Screen->new();
     $self->{stack} = [];
 
-    my $book = Ember::Book->open($filename, $self->{config});
+    if (@args) {
+        my $filename = realpath($args[0]);
+        my $chapter = $args[1];
 
-    $self->push_app('Reader', { book => $book });
+        croak('Unable to locate requested file')
+            unless ($filename && -e $filename);
+
+        my $book = Ember::Book->open($filename, $self->{config});
+
+        $self->push_app('Reader', { book => $book });
+    } else {
+        $self->push_app('Recent');
+    }
 
     return $self;
 }

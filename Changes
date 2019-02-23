@@ -1,8 +1,10 @@
 Revision history for Ember
 
-0.06    ? February 2019
-        Add help screens.
+0.06    23rd February 2019
+        Recent book selection if none given on startup.
+        Added help screens.
         New JSON-based Config.
+        Lots of refactoring.
 
 0.05    19th February 2019
         Chapter selection via table of contents.
