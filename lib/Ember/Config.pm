@@ -119,73 +119,150 @@ sub write_json {
     write_file($path, { binmode => ':utf8', atomic => 1 }, $json);
 }
 
-=item next_id($type)
-
-Returns the next unique ID of the given type.
-
-=cut
-
-sub next_id {
-    my ($self, $type) = @_;
-    my $map = $self->read_json('last_ids', {});
-    my $id = 1;
-
-    if (exists($map->{$type})) {
-        $id = ++$map->{$type};
-    } else {
-        $map->{$type} = 1;
-    }
-
-    $self->write_json('last_ids', $map);
-
-    return $id;
-}
-
 =item get_id($filename)
 
-Fetch the Ember ID for the book with the given filename.
+Fetch the Ember ID for the book with the given filename. In a list context, may
+return a second value which indicates that the ID was newly created.
 
 =cut
 
 sub get_id {
     my ($self, $filename) = @_;
-    my $map = $self->read_json('file_to_id', {});
-    my $id = $map->{$filename};
+    my $to_id = $self->read_json('file_to_id', {});
+    my $id = $to_id->{$filename};
 
-    if (!$id) {
-        $id = $self->next_id('book');
-        $map->{$filename} = $id;
-        $self->write_json('file_to_id', $map);
-    }
+    return $id if ($id);
 
-    return $id;
+    my $to_file = $self->read_json('id_to_file', [0]);
+
+    $id = ++$to_file->[0];
+    $to_id->{$filename} = $id;
+    $to_file->[$id] = $filename;
+
+    $self->write_json('file_to_id', $to_id);
+    $self->write_json('id_to_file', $to_file);
+
+    return wantarray ? ($id, 1) : $id;
 }
 
-=item get_pos($book)
+=item get_filename($book_id)
+
+Fetch the filename for a given Ember book ID.
+
+=cut
+
+sub get_filename {
+    my ($self, $book_id) = @_;
+    my $to_file = $self->read_json('id_to_file', []);
+
+    return $to_file->[$book_id];
+}
+
+=item get_pos($book_id)
 
 Fetch the last chapter and reading position for a given eBook.
 
 =cut
 
 sub get_pos {
-    my ($self, $book) = @_;
+    my ($self, $book_id) = @_;
     my $map = $self->read_json('positions', {});
 
-    return exists($map->{$book}) ? @{$map->{$book}} : ();
+    return exists($map->{$book_id}) ? @{$map->{$book_id}} : ();
 }
 
-=item save_pos($book, $chapter, $pos)
+=item save_pos($book_id, $chapter_id, $pos)
 
 Save the last reading position for a book.
 
 =cut
 
 sub save_pos {
-    my ($self, $book, $chapter, $pos) = @_;
+    my ($self, $book_id, $chapter_id, $pos) = @_;
     my $map = $self->read_json('positions', {});
 
-    $map->{$book} = [ $chapter, $pos ];
+    $map->{$book_id} = [ $chapter_id, $pos ];
     $self->write_json('positions', $map);
+}
+
+=item get_recent()
+
+Fetch a list of recently-viewed books. Returns an array of arrays of timestamp
+and book ID.
+
+=cut
+
+sub get_recent {
+    my ($self) = @_;
+
+    return $self->read_json('recent', []);
+}
+
+=item add_recent($book_id)
+
+Add an entry for the given book to the recents list.
+
+=cut
+
+sub add_recent {
+    my ($self, $book_id) = @_;
+    my $recent = $self->read_json('recent', []);
+    my $count = @{$recent};
+
+    if (($count > 0) && ($recent->[0][1] == $book_id)) {
+        $recent->[0][0] = time;
+    } else {
+        for (my $i = 1; $i < $count; $i++) {
+            if ($recent->[$i][1] == $book_id) {
+                splice(@{$recent}, $i, 1);
+                last;
+            }
+        }
+
+        unshift(@{$recent}, [ time, $book_id ]);
+    }
+
+    $self->write_json('recent', $recent);
+}
+
+=item get_metadata([ $book_id ])
+
+Fetch metadata for a book, or for all books;
+
+=cut
+
+sub get_metadata {
+    my ($self, $book_id) = @_;
+    my $cache = $self->read_json('metadata', []);
+
+    return $cache if (!$book_id);
+    return $cache->{$book_id} if (exists($cache->[$book_id]));
+    return {};
+}
+
+=item set_metadata($book_id, $metadata)
+
+Set the metadata for a book.
+
+=cut
+
+sub set_metadata {
+    my ($self, $book_id, $metadata) = @_;
+    my $cache = $self->read_json('metadata', []);
+    my %out;
+
+    $out{title} = $metadata->{title} if (defined($metadata->{title}));
+    $out{author} = join(', ', @{$metadata->{authors}})
+        if (defined($metadata->{authors}));
+
+    if (defined($metadata->{series})) {
+        $out{series} = $metadata->{series};
+        $out{index} = $metadata->{series_index}
+            if (defined($metadata->{series_index}));
+    }
+
+    $cache->[$book_id] = \%out;
+    $self->write_json('metadata', $cache);
 }
 
 =back

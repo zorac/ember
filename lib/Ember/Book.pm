@@ -20,7 +20,7 @@ retrieving their chapters and other details.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( id filename vfs config metadata chapters );
+use fields qw( id filename vfs config metadata chapters is_new );
 
 use Carp;
 
@@ -64,7 +64,7 @@ The L<Ember::VFS> instance providing the data for this book.
 
 =item config
 
-An Ember configuration instance.
+An L<Ember::Config> instance.
 
 =item metadata
 
@@ -73,6 +73,10 @@ Metadata about this book.
 =item chapters
 
 An array of L<Ember::Chapter> objects contained within this book.
+
+=item is_new
+
+True if this is the first time the book has been opened.
 
 =back
 
@@ -94,10 +98,12 @@ sub new {
     my $vfs = $args->{vfs};
     my $filename = $vfs->{filename};
     my $config = $args->{config};
+    my ($id, $is_new) = $config->get_id($filename);
 
     $self->{config} = $config;
     $self->{vfs} = $vfs;
-    $self->{id} = $config->get_id($filename);
+    $self->{id} = $id;
+    $self->{is_new} = $is_new ? 1 : 0;
     $self->{filename} = $filename;
     $self->{metadata} = {};
     $self->{chapters} = [];
@@ -118,7 +124,12 @@ sub open {
 
     if (1) {
         require Ember::EPUB::Book;
-        return Ember::EPUB::Book->new({ vfs => $vfs, config => $config });
+
+        my $book = Ember::EPUB::Book->new({ vfs => $vfs, config => $config });
+
+        $book->save_metadata() if ($book->{is_new});
+
+        return $book;
     }
 
     # TODO support other formats
@@ -173,14 +184,18 @@ sub get_pos {
 
 =item save_pos($chapter, $pos)
 
-Save the current chapter and position for this book.
+Save the current chapter and position for this book, and add it to the recent
+books list.
 
 =cut
 
 sub save_pos {
     my ($self, $chapter, $pos) = @_;
+    my $config = $self->{config};
+    my $id = $self->{id};
 
-    return $self->{config}->save_pos($self->{id}, $chapter->{path}, $pos); # TODO
+    $config->save_pos($id, $chapter->{path}, $pos); # TODO
+    $config->add_recent($id);
 }
 
 =item display_metadata()
@@ -219,6 +234,18 @@ sub display_metadata {
     }
 
     return @meta;
+}
+
+=item save_metadata()
+
+Save metadata for this book to the configuration store.
+
+=cut
+
+sub save_metadata {
+    my ($self) = @_;
+
+    $self->{config}->set_metadata($self->{id}, $self->{metadata});
 }
 
 =back
