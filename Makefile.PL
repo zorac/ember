@@ -1,6 +1,7 @@
 use 5.008;
 use strict;
 use warnings;
+
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -9,12 +10,13 @@ WriteMakefile(
     VERSION_FROM        => 'lib/Ember.pm',
     ABSTRACT_FROM       => 'lib/Ember.pm',
     LICENSE             => 'artistic_2',
-    EXE_FILES           => [ 'bin/ember' ],
     MIN_PERL_VERSION    => '5.008',
-    TEST_REQUIRES => {
-        'Test::More' => '0',
+    EXE_FILES           => [ 'bin/ember' ],
+    PL_FILES            => { 'bin/build.PL' => 'bin/ember' },
+    TEST_REQUIRES       => {
+        'Test::More'        => '0',
     },
-    PREREQ_PM => {
+    PREREQ_PM           => {
         'Archive::Zip'      => '0',
         'Carp'              => '0',
         'Cwd'               => '0',
@@ -27,6 +29,11 @@ WriteMakefile(
         'Term::ReadKey'     => '0',
         'XML::Simple'       => '0',
     },
-    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Ember-*' },
+    dist                => {
+        COMPRESS    => 'gzip -9f',
+        SUFFIX      => 'gz',
+    },
+    clean => {
+        FILES       => 'Ember-*'
+    },
 );

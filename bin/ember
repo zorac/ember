@@ -18,14 +18,39 @@ use Carp qw( cluck confess verbose );
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Ember;
-
 $SIG{__DIE__} = \&confess;
 $SIG{__WARN__} = \&cluck;
 
-my $app = Ember->new(@ARGV);
+eval {
+    require Ember;
 
-$app->run();
+    my $app = Ember->new(@ARGV);
+
+    $app->run();
+}; if ($@) {
+    if ($@ =~ /^Can't locate \S+ in \@INC \(you may need to install the (\S+) module\)/) {
+        print STDERR <<"EOF";
+
+It looks like one or more of Ember's dependencies are missing. In particualar,
+Perl can't find the following module: $1
+
+You can install all the modules which Ember requires by using CPAN:
+
+perl -MCPAN -e 'notest install qw( Archive::Zip Carp Cwd File::Slurp FindBin HTML::FormatText JSON Scalar::Util Term::ANSIScreen Term::ReadKey XML::Simple );
+
+EOF
+    } else {
+        print STDERR <<"EOF";
+
+Sorry, it looks like Ember has encountered an error. If you'd like to submit a
+bug report, you can do so here: https://github.com/zorac/ember/issues
+Please include the error dump below, and any details as to what you were doing
+at the time.
+
+$@
+EOF
+    }
+}
 
 =head1 DESCRIPTION
 
