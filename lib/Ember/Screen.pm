@@ -44,7 +44,7 @@ sub new {
     my $self = fields::new($class);
 
     binmode(STDOUT, ':utf8');
-    ReadMode(3); # noech
+    ReadMode(3); # noecho
 
     return $self;
 }

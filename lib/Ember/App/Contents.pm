@@ -19,22 +19,16 @@ This class impements a table-of-contens viewer for an eBook.
 use 5.008;
 use strict;
 use warnings;
-use base qw( Ember::App::Pager );
-use fields qw( ids table formatter input );
-
-use Ember::Format::KeyValue;
+use base qw( Ember::App::Selector );
+use fields qw( ids );
 
 =head2 Fields
 
 =over
 
-=item table
+=item ids
 
-The table of contents to display.
-
-=item formatter
-
-The table formatter to use.
+The chapter IDs.
 
 =back
 
@@ -50,20 +44,19 @@ Create a new table of contents viewer. Settable fields: book (required).
 
 sub new {
     my ($class, $args) = @_;
-    my $self = $class->SUPER::new($args);
-    my (@ids, @table);
-    my $i = 1;
+    my (@ids, @titles);
 
     foreach my $chapter (@{$args->{book}{chapters}}) {
         next if ($chapter->{skip});
-        $ids[$i] = $chapter->{id};
-        push(@table, [ $i => $chapter->{title} ]);
-        $i++;
+        push(@ids, $chapter->{id});
+        push(@titles, $chapter->{title});
     }
 
+    $args->{items} = \@titles;
+
+    my $self = $class->SUPER::new($args);
+
     $self->{ids} = \@ids;
-    $self->{table} = \@table;
-    $self->{formatter} = Ember::Format::KeyValue->new();
 
     return $self;
 }
@@ -73,68 +66,6 @@ sub new {
 =head2 Instance Methods
 
 =over
-
-=item layout($width_changed, $height_changed)
-
-Lay out the table of contents for the current screen size.
-
-=cut
-
-sub layout {
-    my ($self, $width_changed) = @_;
-
-    if ($width_changed) {
-        my @lines = $self->{formatter}->format($self->{width}, $self->{table});
-
-        $self->{lines} = \@lines;
-    }
-
-    $self->SUPER::layout();
-}
-
-=item keypress($key)
-
-Handle keypresses to perform chapter selection.
-
-=cut
-
-sub keypress {
-    my ($self, $key) = @_;
-    my $input = $self->{input};
-
-    if ($key =~ /^\d$/) {
-        $input = defined($input) ? "$input$key" : $key;
-        $self->{input} = $input;
-        $self->footer("Go to: $input", 1);
-    } elsif ($key eq 'bs') {
-        if (defined($input)) {
-            my $len = length($input);
-
-            if ($len <= 1) {
-                $self->{input} = undef;
-                $self->footer(undef, 0);
-            } else{
-                $input = substr($input, 0, $len - 1);
-                $self->{input} = $input;
-                $self->footer("Go to: $input", 1);
-            }
-        }
-    } elsif (($key eq 'esc') && defined($input)) {
-        $self->{input} = undef;
-        $self->footer(undef, 0);
-    } elsif (($key eq "\n") && defined($input)) {
-        my $id = $self->{ids}[$input];
-
-        if (defined($id)) {
-            return 'pop', 'chapter', $id;
-        } else {
-            $self->{input} = undef;
-            $self->footer("Unknown chapter number: $input", 0);
-        }
-    } else {
-        return $self->SUPER::keypress($key);
-    }
-}
 
 =item help_text()
 
@@ -151,28 +82,23 @@ Type a chapter number and press enter to jump directly to that chapter.
 EOF
 }
 
-=item help_keys()
+=item selected($index)
 
-Return help on the supported keypresses for the application.
+Called when the user selects a chapter.
 
 =cut
 
-sub help_keys {
-    my ($self) = @_;
-    my $keys = $self->SUPER::help_keys();
+sub selected {
+    my ($self, $index) = @_;
 
-    push(@{$keys},
-        [ '1-9...' => 'Type a chapter number' ],
-    );
-
-    return $keys;
+    return 'pop', 'chapter', $self->{ids}[$index];
 }
 
 =back
 
 =head1 SEE ALSO
 
-L<Ember::App>
+L<Ember::App::Selector>
 
 =head1 AUTHOR
 
