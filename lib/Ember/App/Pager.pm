@@ -146,7 +146,6 @@ sub render {
 
     $self->{pos} = $self->{lines_pos}[$first];
     $self->{screen}->clear_screen();
-    $self->{screen}->move_to(1, 1);
 
     for (my $line = $first; $line < $last; $line++) {
         print $self->{lines}[$line], "\n";
@@ -216,7 +215,7 @@ sub footer() {
         }
     }
 
-    $self->{screen}->move_to(1, $self->{height});
+    $self->{screen}->move_to(0, $self->{height} - 1);
     printf('%-' . $self->{width} . 's', $text);
     STDOUT->flush();
 }

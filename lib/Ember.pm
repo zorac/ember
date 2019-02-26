@@ -137,7 +137,6 @@ sub run {
     }
 
     $SIG{WINCH} = undef;
-    print STDERR "\n"
 }
 
 =item display()

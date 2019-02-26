@@ -25,7 +25,7 @@ WriteMakefile(
         'HTML::FormatText'  => '0',
         'JSON'              => '0',
         'Scalar::Util'      => '0',
-        'Term::ANSIScreen'  => '0',
+        'Term::Cap'         => '0',
         'Term::ReadKey'     => '0',
         'XML::Simple'       => '0',
     },

@@ -36,7 +36,7 @@ Perl can't find the following module: $1
 
 You can install all the modules which Ember requires by using CPAN:
 
-perl -MCPAN -e 'notest install qw( Archive::Zip Carp Cwd File::Slurp FindBin HTML::FormatText JSON Scalar::Util Term::ANSIScreen Term::ReadKey XML::Simple );
+perl -MCPAN -e 'notest install qw( Archive::Zip Carp Cwd File::Slurp FindBin HTML::FormatText JSON Scalar::Util Term::Cap Term::ReadKey XML::Simple );
 
 EOF
     } else {

@@ -12,16 +12,16 @@ my $screen = Ember::Screen->new();
 
 =head1 DESCRIPTION
 
-Extends Term::ANSIScreen to provide additional functionality.
+Provides screen management for Ember apps.
 
 =cut
 
 use 5.008;
 use strict;
 use warnings;
-use fields;
+use fields qw( termcap );
 
-use Term::ANSIScreen qw( locate cls );
+use Term::Cap;
 use Term::ReadKey;
 
 our %KEYMAP = (
@@ -35,7 +35,7 @@ our %KEYMAP = (
 
 =item new()
 
-Create a new screen object, and configure the display.
+Create a new screen object, and initialise the display.
 
 =cut
 
@@ -44,7 +44,9 @@ sub new {
     my $self = fields::new($class);
 
     binmode(STDOUT, ':utf8');
-    ReadMode(3); # noecho
+    ReadMode('cbreak');
+    $self->{termcap} = Term::Cap->Tgetent();
+    $self->{termcap}->Tputs('ti', 1, *STDOUT);
 
     return $self;
 }
@@ -56,7 +58,10 @@ Restore the display to its original settings.
 =cut
 
 sub DESTROY {
-    ReadMode(0); # restore
+    my ($self) = @_;
+
+    $self->{termcap}->Tputs('te', 1, *STDOUT);
+    ReadMode('restore');
 }
 
 =back
@@ -74,31 +79,34 @@ Returns the screen width and hieght, in characters.
 =cut
 
 sub get_size {
-    my ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
+    my ($self) = @_;
+    my ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize(*STDOUT);
 
     return($wchar, $hchar);
 }
 
 =item clear_screen()
 
-Clears the screen.
+Clears the screen and moves the cursor to the top left.
 
 =cut
 
 sub clear_screen {
-    print STDERR cls();
+    my ($self) = @_;
+
+    $self->{termcap}->Tputs('cl', 1, *STDOUT);
 }
 
 =item move_to($x, $y)
 
-Move the cursor to the specified coordinates, where (1, 1) is the top left.
+Move the cursor to the specified coordinates, where (0, 0) is the top left.
 
 =cut
 
 sub move_to {
     my ($self, $x, $y) = @_;
 
-    print STDERR locate($y, $x);
+    $self->{termcap}->Tgoto('cm', $x, $y, *STDOUT);
 }
 
 =item read_key()
@@ -109,7 +117,8 @@ or one of the special values from %KEYMAP.
 =cut
 
 sub read_key() {
-    my $key = ReadKey(0);
+    my ($self) = @_;
+    my $key = ReadKey(0, *STDIN);
     my $len = length($key);
 
     if ($len == 1) {
