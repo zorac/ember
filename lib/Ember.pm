@@ -31,7 +31,7 @@ use Ember::Config;
 use Ember::Screen;
 use Ember::Util;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head2 Fields
 
@@ -205,7 +205,7 @@ sub pop_app {
 
 =head1 SEE ALSO
 
-L<ember>, L<Ember::Book>, L<Ember::Config>, L<Ember::App::Reader>
+L<ember>, L<Ember::Screen>, L<Ember::App>, L<Ember::Config>, L<Ember::Book>
 
 =head1 AUTHOR
 

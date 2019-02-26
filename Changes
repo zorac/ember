@@ -1,5 +1,8 @@
 Revision history for Ember
 
+0.07    26th February 2019
+        Re-worked screen-handling, now restores on exit.
+
 0.06    23rd February 2019
         Recent book selection if none given on startup.
         Added help screens.

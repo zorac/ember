@@ -7,32 +7,36 @@ Ember is a very basic command-line interface to reading eBooks. Features:
 - Supports macOS (tested) and Linux (hopefully), but not yet Windows
 - Remembers last position in each book
 
+## Requirements
+
+Ember uses a number of third-party CPAN modules. If any are missing, it will
+provide an error mrssaga on startup tellling you how to install them.
+
 ## Installation
 
-```
+You can run Ember directly from the bin directory, or install the scrupt and
+libraries into the standard locations for your Perl installation:
+
+```sh
 perl Makefile.PL
 make install
 ```
 
 ## Usage
 
-Open an eBook using the command `ember SomeBook.epub`. The following keypresses
-are supported to navigate the applcation:
+Open an eBook using the command `ember SomeBook.epub`. If you don't specify a
+file, a list of nay recently-opened books will be displayed.
 
-- **n**, ***space*** - next page
-- **p**,  **b** - previous page
-- **i** - view book info
-- **c** - view table of contents
-- **r** - refresh screen
-- **q**, ***escape*** - quit
+The following keypresses are supported to navigate the application:
 
-## Requirements
+- **N**, ***Space*** - next page
+- **P**,  **B** - previous page
+- **I** - view book info
+- **C** - view table of contents
+- **R** - refresh screen
+- **Q**, ***Escape*** - go back to the previous screen, or quit
+- **H** - display help for the current screen
 
-The following non-standard Perl modules can be installed via CPAN.
+## Supported eBook Formats:
 
-- Archive::Zip
-- File::Slurp
-- HTML::FormatText
-- Term::ANSIScreen
-- Term::ReadKey
-- XML::Simple
+- EPUB (only partial support for EPUB3)

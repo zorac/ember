@@ -41,7 +41,7 @@ The book IDs.
 
 =item new($args)
 
-Create a new recent books viewer
+Create a new recent books viewer.
 
 =cut
 
@@ -52,7 +52,6 @@ sub new {
     my $metadata = $config->get_metadata();
 
     foreach my $recent (@{$config->get_recent()}) {
-        use Data::Dumper; print STDERR Dumper($recent);
         my $id = $recent->[1];
         my $meta = $metadata->[$id];
         my $title = $meta->{title} || 'Unknown';

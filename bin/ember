@@ -8,6 +8,11 @@ ember - A CLI-based reader for eBooks.
 
 ember my_ebook.epub
 
+=head1 DESCRIPTION
+
+Ember is a very simple CLI-based reader for eBooks. It will automatically adapt
+to your terminal width, and remembers the last position in each book.
+
 =cut
 
 use 5.008;
@@ -51,11 +56,6 @@ $@
 EOF
     }
 }
-
-=head1 DESCRIPTION
-
-Ember is a very simple CLI-based reader for eBooks. It will automatically adapt
-to your terminal width, and remembers the last position in each book.
 
 =head2 Key Commands
 
