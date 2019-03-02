@@ -46,6 +46,7 @@ sub new {
     binmode(STDOUT, ':utf8');
     ReadMode('cbreak');
     $self->{termcap} = Term::Cap->Tgetent();
+    $self->{termcap}->Trequire(qw( cl cm ));
     $self->{termcap}->Tputs('ti', 1, *STDOUT);
 
     return $self;

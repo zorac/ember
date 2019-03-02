@@ -10,7 +10,7 @@ Ember is a very basic command-line interface to reading eBooks. Features:
 ## Requirements
 
 Ember uses a number of third-party CPAN modules. If any are missing, it will
-provide an error mrssaga on startup tellling you how to install them.
+provide an error message on startup tellling you how to install them.
 
 ## Installation
 
