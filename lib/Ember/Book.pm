@@ -23,6 +23,7 @@ use warnings;
 use fields qw( id filename vfs config metadata chapters is_new );
 
 use Carp;
+use Cwd qw( realpath );
 use File::Basename;
 
 use Ember::Util;
@@ -106,6 +107,10 @@ format and generate an object of the required subclass.
 
 sub open {
     my ($class, $filename, $config) = @_;
+
+    $filename = realpath($filename);
+    croak("File not found: $filename") unless (-e $filename);
+
     my $vfs = Ember::VFS->open($filename);
     my $format;
 

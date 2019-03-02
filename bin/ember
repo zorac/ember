@@ -28,8 +28,10 @@ $SIG{__WARN__} = \&cluck;
 
 eval {
     require Ember;
+    require Ember::Args;
 
-    my $app = Ember->new(@ARGV);
+    my $args = Ember::Args->new(@ARGV);
+    my $app = Ember->new($args);
 
     $app->run();
 }; if ($@) {

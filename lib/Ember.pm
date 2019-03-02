@@ -8,7 +8,7 @@ Ember - A CLI-based reader for eBooks.
 
 use Ember;
 
-my $ember = Ember->new(@ARGV);
+my $ember = Ember->new($args);
 
 $ember->run();
 
@@ -24,7 +24,6 @@ use warnings;
 use fields qw( config screen app stack );
 
 use Carp;
-use Cwd qw( realpath );
 
 use Ember::Book;
 use Ember::Config;
@@ -59,31 +58,22 @@ The stack of displayed apps.
 
 =over
 
-=item new(@ARGV)
+=item new($args)
 
-Create a new application object by passing command-line arguments. See L<ember>
-for details on supported arguments.
+Create a new application object by passing an L<Ember::Args> object.
 
 =cut
 
 sub new {
-    my ($class, @args) = @_;
+    my ($class, $args) = @_;
     my $self = fields::new($class);
-
-    # TODO better arg parsing & usage
 
     $self->{config} = Ember::Config->open();
     $self->{screen} = Ember::Screen->new();
     $self->{stack} = [];
 
-    if (@args) {
-        my $filename = realpath($args[0]);
-        my $chapter = $args[1];
-
-        croak('Unable to locate requested file')
-            unless ($filename && -e $filename);
-
-        my $book = Ember::Book->open($filename, $self->{config});
+    if ($args->{book}) {
+        my $book = Ember::Book->open($args->{book}, $self->{config});
 
         $self->push_app('Reader', { book => $book });
     } else {
@@ -205,7 +195,8 @@ sub pop_app {
 
 =head1 SEE ALSO
 
-L<ember>, L<Ember::Screen>, L<Ember::App>, L<Ember::Config>, L<Ember::Book>
+L<ember>, L<Ember::Args>, L<Ember::Screen>, L<Ember::App>, L<Ember::Config>,
+L<Ember::Book>
 
 =head1 AUTHOR
 
