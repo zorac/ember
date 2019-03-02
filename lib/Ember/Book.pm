@@ -23,7 +23,12 @@ use warnings;
 use fields qw( id filename vfs config metadata chapters is_new );
 
 use Carp;
+use File::Basename;
+use File::Slurp;
+use File::Spec;
+use XML::Simple;
 
+use Ember::Metadata::OPF;
 use Ember::Util;
 use Ember::VFS;
 
@@ -116,6 +121,7 @@ sub open {
 
     my $book = $class->new({ vfs => $vfs, config => $config });
 
+    $book->load_external_metadata();
     $book->save_metadata() if ($book->{is_new});
 
     return $book;
@@ -183,6 +189,27 @@ sub save_pos {
 
     $config->save_pos($id, $chapter->{path}, $pos); # TODO
     $config->add_recent($id);
+}
+
+=item load_external_metadata()
+
+Check for external files which may contain metadata about the book, and if so
+load it.
+
+=cut
+
+sub load_external_metadata {
+    my ($self) = @_;
+    my $dir = dirname($self->{filename});
+    my $file = File::Spec->join($dir, 'metadata.opf');
+
+    if (-f $file) {
+        my $opf_raw = read_file($file, { binmode => ':utf8' });
+        my $opf = XMLin($opf_raw);
+        my $metadata = Ember::Metadata::OPF->new($opf);
+
+        $self->{metadata} = $metadata;
+    }
 }
 
 =item display_metadata()
