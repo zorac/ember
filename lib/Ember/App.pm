@@ -102,7 +102,9 @@ subclasses.
 =cut
 
 sub layout {
-    croak('Sub-class has not implemented layout()');
+    my ($self, $width_changed, $height_changed) = @_;
+
+    croak(ref($self) . ' has not implemented layout()');
 }
 
 =item render()
@@ -112,7 +114,9 @@ Render the app to the screen. To be implemented by subclasses.
 =cut
 
 sub render {
-    croak('Sub-class has not implemented render()');
+    my ($self) = @_;
+
+    croak(ref($self) . ' has not implemented render()');
 }
 
 =item keypress($key)

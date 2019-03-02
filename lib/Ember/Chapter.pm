@@ -109,7 +109,9 @@ chapter, restricted to a given display width in characters.
 =cut
 
 sub lines {
-    croak('Sub-class has not implemented lines()');
+    my ($self, $width) = @_;
+
+    croak(ref($self) . ' has not implemented lines()');
 }
 
 =back

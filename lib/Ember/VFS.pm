@@ -100,7 +100,9 @@ within the virtual filesystem.
 =cut
 
 sub content {
-    croak('Sub-class has not implemented content()');
+    my ($self, $path) = @_;
+
+    croak(ref($self) . ' has not implemented content()');
 }
 
 =back

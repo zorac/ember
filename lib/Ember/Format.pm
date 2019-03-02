@@ -50,7 +50,9 @@ restricted to a given display width in characters.
 =cut
 
 sub format {
-    croak('Sub-class has not implemented format()');
+    my ($self, $width, $input) = @_;
+
+    croak(ref($self) . ' has not implemented format()');
 }
 
 =back
