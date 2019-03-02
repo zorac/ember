@@ -19,9 +19,11 @@ Abstract superclass for objects which provide a virtual filesystem to Ember.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( filename );
+use fields qw( filename json xml );
 
 use Carp;
+use JSON;
+use XML::Simple;
 
 use Ember::Util;
 
@@ -37,6 +39,14 @@ my %HINTS = (
 =item filename
 
 The base file or directory name.
+
+=item json
+
+A JSON encoder/decoder.
+
+=item xml
+
+An XML encoder/decoder.
 
 =back
 
@@ -92,17 +102,120 @@ sub open {
 
 =over
 
-=item content($path)
+=item read_text($path)
 
 Must be implemented by sub-classes to fetch the file content at a given path
+within the virtual filesystem. Returns undefined if the file does not exist.
+
+=cut
+
+sub read_text {
+    my ($self, $path) = @_;
+
+    croak(ref($self) . ' has not implemented read_text()');
+}
+
+=item write_text($path, $content)
+
+May be implemented by sub-classes to allow writing file content at a given path
 within the virtual filesystem.
 
 =cut
 
-sub content {
-    my ($self, $path) = @_;
+sub write_text {
+    my ($self, $path, $content) = @_;
 
-    croak(ref($self) . ' has not implemented content()');
+    croak(ref($self) . ' has not implemented write_text()');
+}
+
+=item _json()
+
+Fetch or create a JSON encoder/decoder.
+
+=cut
+
+sub _json {
+    my ($self) = @_;
+    my $json = $self->{json};
+
+    if (!$json) {
+        $json = JSON->new()->utf8()->indent()->space_after();
+        $self->{json} = $json;
+    }
+
+    return $json;
+}
+
+=item read_json($path)
+
+Read the file at a given path, parse it as JSON, and return the parsed content.
+Returns undefined if the file does not exist.
+
+=cut
+
+sub read_json {
+    my ($self, $path) = @_;
+    my $json = $self->read_text($path);
+
+    return unless (defined($json) && ($json ne ''));
+    return $self->_json()->decode($json); # TODO error handling
+}
+
+=item write_json($path, $content)
+
+Encode the given content as JSON and write it to a file at the given path.
+
+=cut
+
+sub write_json {
+    my ($self, $path, $content) = @_;
+
+    $self->write_text($path, $self->_json()->encode($content));
+}
+
+=item _xml()
+
+Fetch or create an XML encoder/decoder.
+
+=cut
+
+sub _xml {
+    my ($self) = @_;
+    my $xml = $self->{xml};
+
+    if (!$xml) {
+        $xml = XML::Simple->new();
+        $self->{xml} = $xml;
+    }
+
+    return $xml;
+}
+
+=item read_xml($path)
+
+Read the file at a given path, parse it as XML, and return the parsed content.
+Returns undefined if the file does not exist.
+
+=cut
+
+sub read_xml {
+    my ($self, $path) = @_;
+    my $xml = $self->read_text($path);
+
+    return unless (defined($xml) && ($xml ne ''));
+    return $self->_xml()->XMLin($xml); # TODO error handling
+}
+
+=item write_xml($path, $content)
+
+Encode the given content as XML and write it to a file at the given path.
+
+=cut
+
+sub write_xml {
+    my ($self, $path, $content) = @_;
+
+    $self->write_text($path, $self->_xml()->encode($content));
 }
 
 =back

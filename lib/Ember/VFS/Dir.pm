@@ -17,6 +17,7 @@ use warnings;
 use base qw( Ember::VFS );
 
 use File::Slurp;
+use File::Spec;
 
 =head2 Class Methods
 
@@ -45,19 +46,33 @@ sub new {
 
 =over
 
-=item content($path)
+=item read_text($path)
 
 Fetches the content of the given file within the base directory.
 
 =cut
 
-sub content {
+sub read_text {
     my ($self, $path) = @_;
 
-    $path = $self->{filename} . '/' . $path;
+    $path = File::Spec->join($self->{filename}, $path);
 
     return unless (-f $path);
     return read_file($path, { binmode => ':utf8' });
+}
+
+=item write_text($path, $content)
+
+Write the given content to the given file within the base directory.
+
+=cut
+
+sub write_text {
+    my ($self, $path, $content) = @_;
+
+    $path = File::Spec->join($self->{filename}, $path);
+
+    write_file($path, { binmode => ':utf8', atomic => 1 }, $content);
 }
 
 =back

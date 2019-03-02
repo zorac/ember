@@ -30,7 +30,7 @@ sub lines {
     my ($self, $width) = @_;
     my $book = $self->{book};
     my $path = $book->{rootpath} . $self->{path};
-    my $content = $book->{vfs}->content($path);
+    my $content = $book->{vfs}->read_text($path);
 
     return $book->{formatter}->format($width, $content);
 }

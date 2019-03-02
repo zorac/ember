@@ -71,13 +71,13 @@ sub new {
 
 =over
 
-=item content($path)
+=item read_text($path)
 
 Fetches the content of the zip archive member at the given path.
 
 =cut
 
-sub content {
+sub read_text {
     my ($self, $path) = @_;
 
     return unless ($self->{members}{$path});

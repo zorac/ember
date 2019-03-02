@@ -16,8 +16,6 @@ use warnings;
 use base qw( Ember::Book );
 use fields qw( manifest rootpath formatter );
 
-use XML::Simple;
-
 use Ember::EPUB::Chapter;
 use Ember::Format::HTML;
 use Ember::Metadata::OPF;
@@ -54,19 +52,19 @@ contain an EPUB book.
 sub new {
     my ($class, $args) = @_;
     my $vfs = $args->{vfs};
-    my $mime = $vfs->content('mimetype');
+    my $mime = $vfs->read_text('mimetype');
 
     return undef if (!$mime || ($mime !~ /application\/epub\+zip/i));
 
     my $self = $class->SUPER::new($args);
     my $formatter = Ember::Format::HTML->new();
-    my $container = $vfs->content('META-INF/container.xml');
-    my($opf_file, $root_path) = ($container =~ /full-path="((.*?)[^\/]+?)"/);
-    my $opf_raw = $vfs->content($opf_file);
-    my $opf = XMLin($opf_raw);
+    my $container = $vfs->read_xml('META-INF/container.xml');
+    my $opf_file = $container->{rootfiles}{rootfile}{'full-path'};
+    my ($root_path) = ($opf_file =~ /^(.*?)[^\/]*$/);
+    my $opf = $vfs->read_xml($opf_file);
     my %items = %{$opf->{manifest}{item}};
     my @refs = @{$opf->{spine}{itemref}};
-    my(%manifest, %titles, @chapters, $prev);
+    my (%manifest, %titles, @chapters, $prev);
 
     foreach my $id (keys(%items)) {
         $manifest{$id} = {
@@ -78,8 +76,7 @@ sub new {
 
     if ($opf->{spine}{toc}) {
         my $ncx_file = $root_path . $manifest{$opf->{spine}{toc}}{file};
-        my $ncx_raw = $vfs->content($ncx_file);
-        my $ncx = XMLin($ncx_raw);
+        my $ncx = $vfs->read_xml($ncx_file);
         my $navs = $ncx->{navMap}{navPoint};
 
         foreach my $nav (values(%{$navs})) {

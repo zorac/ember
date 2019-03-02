@@ -20,24 +20,18 @@ Ember.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( dir json );
-
-use File::Slurp;
-use JSON;
+use fields qw( vfs );
 
 use Ember::Util;
+use Ember::VFS;
 
 =head2 Fields
 
 =over
 
-=item dir
+=item vfs
 
-The configuration directory.
-
-=item json
-
-A JSON encoder/decoder.
+An L<Ember::VFS> instance for the configuration directory.
 
 =back
 
@@ -56,8 +50,7 @@ sub new {
     my ($class, $dir) = @_;
     my $self = fields::new($class);
 
-    $self->{dir} = $dir;
-    $self->{json} = JSON->new()->utf8()->indent()->space_after();
+    $self->{vfs} = Ember::VFS->open($dir);
 
     return $self;
 }
@@ -98,14 +91,9 @@ Read the contents of the given configuration file and return a reference.
 
 sub read_json {
     my ($self, $name, $if_empty) = @_;
-    my $path = $self->{dir} . '/' . $name . '.json';
+    my $content = $self->{vfs}->read_json("$name.json");
 
-    return $if_empty if (!-f $path);
-
-    my $json = read_file($path, { binmode => ':utf8' });
-
-    return $if_empty if (length($json) == 0);
-    return $self->{json}->decode($json);
+    return defined($content) ? $content : $if_empty;
 }
 
 =item write_json($name, $content)
@@ -116,11 +104,8 @@ Write the input to a given configuration file.
 
 sub write_json {
     my ($self, $name, $content) = @_;
-    my $path = $self->{dir} . '/' . $name . '.json';
-    my $json = $self->{json}->encode($content);
 
-    # TODO error checking
-    write_file($path, { binmode => ':utf8', atomic => 1 }, $json);
+    $self->{vfs}->write_json("$name.json", $content);
 }
 
 =item get_id($filename)
