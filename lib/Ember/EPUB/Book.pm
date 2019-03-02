@@ -83,7 +83,12 @@ sub new {
         my $navs = $ncx->{navMap}{navPoint};
 
         foreach my $nav (values(%{$navs})) {
-            $titles{$nav->{content}{src}} = $nav->{navLabel}{text};
+            my $src = $nav->{content}{src};
+            my $pos = index($src, '#');
+
+            $src = substr($src, 0, $pos) if ($pos > 0);
+
+            $titles{$src} = $nav->{navLabel}{text};
         }
     }
 

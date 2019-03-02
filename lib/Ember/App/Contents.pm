@@ -44,12 +44,27 @@ Create a new table of contents viewer. Settable fields: book (required).
 
 sub new {
     my ($class, $args) = @_;
+    my @chapters = @{$args->{book}{chapters}};
     my (@ids, @titles);
 
-    foreach my $chapter (@{$args->{book}{chapters}}) {
+    foreach my $chapter (@chapters) {
         next if ($chapter->{skip});
+
+        my $title = $chapter->{title};
+
+        next if (!defined($title) || ($title eq ''));
+
         push(@ids, $chapter->{id});
-        push(@titles, $chapter->{title});
+        push(@titles, $title);
+    }
+
+    if (!@ids) {
+        foreach my $chapter (@chapters) {
+            next if ($chapter->{skip});
+
+            push(@ids, $chapter->{id});
+            push(@titles, $chapter->{id});
+        }
     }
 
     $args->{items} = \@titles;
