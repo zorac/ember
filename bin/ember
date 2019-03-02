@@ -27,11 +27,20 @@ $SIG{__DIE__} = \&confess;
 $SIG{__WARN__} = \&cluck;
 
 eval {
-    require Ember;
     require Ember::Args;
 
     my $args = Ember::Args->new(@ARGV);
-    my $app = Ember->new($args);
+    my $app;
+
+    if ($args->{dump}) {
+        require Ember::Script::Dump;
+
+        $app = Ember::Script::Dump->new($args);
+    } else {
+        require Ember;
+
+        $app = Ember->new($args);
+    }
 
     $app->run();
 }; if ($@) {

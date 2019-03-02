@@ -26,6 +26,7 @@ lib/Ember/Format/Text.pm
 lib/Ember/Metadata.pm
 lib/Ember/Metadata/OPF.pm
 lib/Ember/Screen.pm
+lib/Ember/Script/Dump.pm
 lib/Ember/Util.pm
 lib/Ember/VFS.pm
 lib/Ember/VFS/Dir.pm

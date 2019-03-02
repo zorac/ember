@@ -19,7 +19,7 @@ This class is the entrypoint for the Ember application.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( book );
+use fields qw( book dump );
 
 use Getopt::Long;
 
@@ -29,7 +29,11 @@ use Getopt::Long;
 
 =item book
 
-The filename of a book.
+The filename of a book to read.
+
+=item dump
+
+The filename of a book to dump.
 
 =back
 
@@ -48,7 +52,7 @@ sub new {
     my $self = fields::new($class);
     my $parser = Getopt::Long::Parser->new();
 
-    $parser->getoptionsfromarray(\@args, $self, 'book=s');
+    $parser->getoptionsfromarray(\@args, $self, 'book=s', 'dump=s');
     $self->{book} = $args[0] if (@args && !defined($self->{book}));
 
     return $self;
