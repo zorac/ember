@@ -27,22 +27,6 @@ use Carp;
 use Ember::Util;
 use Ember::VFS;
 
-our @METADATA = (
-    [ title         => 'Title',         ''      ],
-    [ title_sort    => 'Title Sort',    'hide'  ],
-    [ authors       => 'Author',        'array' ],
-    [ author_sort   => 'Author Sort',   'hide'  ],
-    [ series        => 'Series',        ''      ],
-    [ series_index  => 'In Series',     ''      ],
-    [ publisher     => 'Publisher',     ''      ],
-    [ date          => 'Date',          ''      ],
-    [ copyright     => 'Copyright',     ''      ],
-    [ language      => 'Language',      ''      ],
-    [ generator     => 'Generator',     ''      ],
-    [ ids           => 'IDs',           'hash'  ],
-    [ description   => 'Description',   'multi' ],
-);
-
 our %HINTS = (
     epub    => 'EPUB',
 );
@@ -69,7 +53,7 @@ An L<Ember::Config> instance.
 
 =item metadata
 
-Metadata about this book.
+An L<Ember::Metadata> with details of this book.
 
 =item chapters
 
@@ -209,34 +193,8 @@ Fetch display metadata for this book. Returns ( [ 'Key' => 'Value' ] ... ).
 
 sub display_metadata {
     my ($self) = @_;
-    my $metadata = $self->{metadata};
-    my @meta;
 
-    foreach my $row (@METADATA) {
-        my ($key, $name, $hint) = @{$row};
-        my $value = $metadata->{$key};
-
-        next if (!$value || ($hint eq 'hide'));
-
-        if ($hint eq 'array') {
-            $name .= 's' if (@{$value} > 1);
-            push(@meta, [ $name, $value->[0] ]);
-
-            for (my $i = 1; $i < @{$value}; $i++) {
-                push(@meta, [ '', $value->[$i] ]);
-            }
-        } elsif ($hint eq 'hash') {
-            foreach my $hkey (sort(keys(%{$value}))) {
-                push(@meta, [ $hkey, $value->{$hkey} ]);
-            }
-        } elsif ($hint eq 'multi') {
-            push(@meta, [ undef, $value ]);
-        } else {
-            push(@meta, [ $name, $value ]);
-        }
-    }
-
-    return @meta;
+    return $self->{metadata}->display();
 }
 
 =item save_metadata()
@@ -255,7 +213,7 @@ sub save_metadata {
 
 =head1 SEE ALSO
 
-L<Ember::Chapter>, L<Ember::VFS>
+L<Ember::Chapter>, L<Ember::VFS>, L<Ember::Metadata>, L<Ember::Config>
 
 =head1 AUTHOR
 

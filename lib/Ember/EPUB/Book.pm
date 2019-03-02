@@ -20,6 +20,7 @@ use XML::Simple;
 
 use Ember::EPUB::Chapter;
 use Ember::Format::HTML;
+use Ember::Metadata::OPF;
 
 =head2 Fields
 
@@ -65,7 +66,7 @@ sub new {
     my $opf = XMLin($opf_raw);
     my %items = %{$opf->{manifest}{item}};
     my @refs = @{$opf->{spine}{itemref}};
-    my(%manifest, %titles, @chapters, $prev, %metain, %metaout);
+    my(%manifest, %titles, @chapters, $prev);
 
     foreach my $id (keys(%items)) {
         $manifest{$id} = {
@@ -104,57 +105,7 @@ sub new {
         push(@chapters, $chapter);
     }
 
-    $self->parse_metadata(\%metain, $opf->{metadata}{meta});
-    $self->parse_metadata(\%metain, $opf->{metadata});
-
-    $metaout{title} = $metain{title}[0]{content}
-        if ($metain{title});
-    $metaout{title_sort} = $metain{title_sort}[0]{content}
-        if ($metain{title_sort});
-    $metaout{series} = $metain{series}[0]{content}
-        if ($metain{series});
-    $metaout{series_index} = 0 + $metain{series_index}[0]{content}
-        if ($metain{series_index});
-    $metaout{publisher} = $metain{publisher}[0]{content}
-        if ($metain{publisher});
-    $metaout{generator} = $metain{generator}[0]{content}
-        if ($metain{generator});
-    $metaout{language} = $metain{language}[0]{content}
-        if ($metain{language});
-    $metaout{copyright} = $metain{rights}[0]{content}
-        if ($metain{rights});
-
-    if ($metain{creator}) {
-        $metaout{authors} = [ map { $_->{content} } @{$metain{creator}} ];
-        $metaout{author_sort} = $metain{creator}[0]{'file-as'}
-            if ($metain{creator}[0]{'file-as'});
-    }
-
-    if ($metain{date} && ($metain{date}[0]{content} =~ /^([^T]+)/)) {
-        $metaout{date} = $1 unless ($1 eq '0101-01-01');
-    }
-
-    if ($metain{description}) {
-        my @lines = $formatter->format(99999, $metain{description}[0]{content});
-
-        $metaout{description} = join("\n", @lines);
-    }
-
-    if ($metain{identifier}) {
-        $metaout{ids} = { map {
-            ($_->{scheme} || $_->{id} || 'id') => $_->{content}
-        } @{$metain{identifier}} };
-    }
-
-    # use Data::Dumper; $Data::Dumper::Indent = 1; die Dumper(\%metaout);
-    # TODO parse more metadata, TOC, etc
-    # dc:identifier (multi,opf:scheme)
-    # dc:relation?
-    # dc:subject?
-    # dc:source?
-    # dc:coverage?
-
-    $self->{metadata} = \%metaout;
+    $self->{metadata} = Ember::Metadata::OPF->new($opf);
     $self->{manifest} = \%manifest;
     $self->{chapters} = \@chapters;
     $self->{rootpath} = $root_path;
@@ -168,54 +119,6 @@ sub new {
 =head2 Instance Methods
 
 =over
-
-=item parse_metadata($out, $in)
-
-Extract metadata from parsed XML.
-
-=cut
-
-sub parse_metadata {
-    my ($self, $out, $in) = @_;
-    my $ref = ref($in);
-
-    if ($ref eq 'ARRAY') {
-        $in = { map {
-            ($_->{name} || $_->{property}) => $_
-        } @{$in} };
-    } elsif ($ref ne 'HASH') {
-        return;
-    }
-
-    foreach my $key (keys(%{$in})) {
-        my $value = $in->{$key};
-        my $ref = ref($value);
-
-        next if (($ref eq 'HASH') && !%{$value});
-        $key =~ /^([^:]+)(?::([^:]+))?/;
-        next if (($1 eq 'meta') || ($1 eq 'xmlns')
-            || ($2 && ($2 eq 'user_metadata')));
-        $key = $2 ? $2 : $1;
-
-        my @values = ($ref eq 'ARRAY') ? @{$value} : ($value);
-
-        for (my $i = 0; $i < @values; $i++) {
-            if (ref($values[$i]) eq 'HASH') {
-                foreach my $subkey (keys(%{$values[$i]})) {
-                    if ($subkey =~ /^(.+):(.+)$/) {
-                        $values[$i]{$2} = $values[$i]{$subkey}
-                            if ($1 ne 'xmlns');
-                        delete($values[$i]{$subkey});
-                    }
-                }
-            } else {
-                $values[$i] = { content => $values[$i] };
-            }
-        }
-
-        $out->{$key} = \@values;
-    }
-}
 
 =back
 

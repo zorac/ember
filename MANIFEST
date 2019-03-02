@@ -22,6 +22,8 @@ lib/Ember/Format.pm
 lib/Ember/Format/HTML.pm
 lib/Ember/Format/KeyValue.pm
 lib/Ember/Format/Text.pm
+lib/Ember/Metadata.pm
+lib/Ember/Metadata/OPF.pm
 lib/Ember/Screen.pm
 lib/Ember/Util.pm
 lib/Ember/VFS.pm
