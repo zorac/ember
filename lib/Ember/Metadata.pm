@@ -168,6 +168,10 @@ sub display {
 
 =back
 
+=head1 SEE ALSO
+
+L<Ember::Book>
+
 =head1 AUTHOR
 
 Mark Rigby-Jones <mark@rigby-jones.net>

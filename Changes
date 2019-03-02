@@ -1,5 +1,10 @@
 Revision history for Ember
 
+0.08    2nd March 2019
+        Fixes and improvements to table-of-contents generation.
+        Initial support for loading external metadata.
+        Refactoring and internal improvements.
+
 0.07    26th February 2019
         Re-worked screen-handling, now restores on exit.
 

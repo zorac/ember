@@ -16,8 +16,6 @@ use strict;
 use warnings;
 use base qw( Ember::Format );
 
-use HTML::FormatText;
-
 =head2 Instance Methods
 
 =over
@@ -82,6 +80,10 @@ sub format {
 }
 
 =back
+
+=head1 SEE ALSO
+
+L<Ember::Format>
 
 =head1 AUTHOR
 

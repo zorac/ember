@@ -6,7 +6,8 @@ Ember::Format::KeyValue - Formats a collection of keys and values for display.
 
 =head1 DESCRIPTION
 
-This formatter converts a colection of keys and values into a plain-text table.
+This formatter converts a collection of keys and values into a plain-text
+table.
 
 =cut
 
@@ -17,6 +18,16 @@ use base qw( Ember::Format );
 use fields qw( splitter );
 
 use Ember::Format::Text;
+
+=head2 Fields
+
+=over
+
+=item splitter
+
+A text formatter used to split values into lines.
+
+=back
 
 =head2 Class Methods
 
@@ -92,6 +103,10 @@ sub format {
 }
 
 =back
+
+=head1 SEE ALSO
+
+L<Ember::Format>
 
 =head1 AUTHOR
 

@@ -110,7 +110,7 @@ sub selected {
 
 =head1 SEE ALSO
 
-L<Ember::App>
+L<Ember::App::Selector>
 
 =head1 AUTHOR
 

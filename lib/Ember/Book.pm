@@ -25,7 +25,6 @@ use fields qw( id filename vfs config metadata chapters is_new );
 use Carp;
 use File::Basename;
 
-use Ember::Metadata::OPF;
 use Ember::Util;
 use Ember::VFS;
 
@@ -201,7 +200,8 @@ sub load_external_metadata {
     my $opf = $vfs->read_xml('metadata.opf');
 
     if ($opf) {
-        my $metadata = Ember::Metadata::OPF->new($opf);
+        my $class = get_class('Metadata', 'OPF');
+        my $metadata = $class->new($opf);
 
         $self->{metadata} = $metadata;
     }

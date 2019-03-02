@@ -124,7 +124,7 @@ sub keypress {
 
 =head1 SEE ALSO
 
-L<Ember::App>
+L<Ember::App::Pager>
 
 =head1 AUTHOR
 
