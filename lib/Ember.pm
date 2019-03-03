@@ -30,7 +30,19 @@ use Ember::Config;
 use Ember::Screen;
 use Ember::Util;
 
+=head2 Constants
+
+=over
+
+=item $VERSION
+
+The current version number for Ember.
+
+=cut
+
 our $VERSION = '0.08';
+
+=back
 
 =head2 Fields
 

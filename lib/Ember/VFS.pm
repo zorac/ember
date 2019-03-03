@@ -27,10 +27,22 @@ use XML::Simple;
 
 use Ember::Util;
 
-my %HINTS = (
+=head2 Constants
+
+=over
+
+=item %HINTS
+
+Mapping of file extensions to likely VFS types.
+
+=cut
+
+our %HINTS = (
     epub    => 'Zip',
     zip     => 'Zip',
 );
+
+=back
 
 =head2 Fields
 

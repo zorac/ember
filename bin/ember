@@ -52,7 +52,7 @@ Perl can't find the following module: $1
 
 You can install all the modules which Ember requires by using CPAN:
 
-perl -MCPAN -e 'notest install qw( Archive::Zip File::Slurp HTML::FormatText JSON Term::ReadKey XML::Simple );
+perl -MCPAN -e 'notest install qw( Archive::Zip File::Slurp HTML::Tree JSON Term::ReadKey XML::Simple );
 
 EOF
     } else {

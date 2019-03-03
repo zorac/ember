@@ -29,9 +29,21 @@ use File::Basename;
 use Ember::Util;
 use Ember::VFS;
 
+=head2 Constants
+
+=over
+
+=item %HINTS
+
+Mapping of file extensions to likely eBook formats.
+
+=cut
+
 our %HINTS = (
     epub    => 'EPUB',
 );
+
+=back
 
 =head2 Fields
 

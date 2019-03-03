@@ -14,21 +14,21 @@ WriteMakefile(
     EXE_FILES           => [ 'bin/ember' ],
     PL_FILES            => { 'bin/build.PL' => 'bin/ember' },
     TEST_REQUIRES       => {
-        'Test::More'        => '0',
+        'Test::More'    => '0',
     },
     PREREQ_PM           => {
-        'Archive::Zip'      => '0',
-        'File::Slurp'       => '0',
-        'HTML::FormatText'  => '0',
-        'JSON'              => '0',
-        'Term::ReadKey'     => '0',
-        'XML::Simple'       => '0',
+        'Archive::Zip'  => '0',
+        'File::Slurp'   => '0',
+        'HTML::Tree'    => '5',
+        'JSON'          => '0',
+        'Term::ReadKey' => '0',
+        'XML::Simple'   => '0',
     },
     dist                => {
-        COMPRESS    => 'gzip -9f',
-        SUFFIX      => 'gz',
+        COMPRESS        => 'gzip -9f',
+        SUFFIX          => 'gz',
     },
     clean => {
-        FILES       => 'Ember-*'
+        FILES           => 'Ember-*'
     },
 );

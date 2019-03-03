@@ -18,7 +18,9 @@ use fields qw( title title_sort authors author_sort series series_index
 
 =head2 Constants
 
-=over @FIELDS
+=over
+
+=item @FIELDS
 
 Defines the metadata fields which Ember supports. Each entry is an array of
 [ $field, $display_name, $hint ]. Possible values for the hint are 'text',

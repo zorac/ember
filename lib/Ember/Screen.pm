@@ -24,10 +24,22 @@ use fields qw( termcap );
 use Term::Cap;
 use Term::ReadKey;
 
+=head2 Constants
+
+=over
+
+=item %KEYMAP
+
+Mapping of ASCII values to special key names.
+
+=cut
+
 our %KEYMAP = (
     27  => 'esc',
     127 => 'bs',
 );
+
+=back
 
 =head2 Class Methods
 
