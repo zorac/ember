@@ -14,7 +14,7 @@ use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::App::Pager );
-use fields qw( table formatter input );
+use fields qw( table input );
 
 use Ember::Format::KeyValue;
 
@@ -25,10 +25,6 @@ use Ember::Format::KeyValue;
 =item table
 
 The table of contents to display.
-
-=item formatter
-
-The table formatter to use.
 
 =item input
 
@@ -57,7 +53,6 @@ sub new {
     }
 
     $self->{table} = \@table;
-    $self->{formatter} = Ember::Format::KeyValue->new();
 
     return $self;
 }
@@ -78,7 +73,8 @@ sub layout {
     my ($self, $width_changed) = @_;
 
     if ($width_changed) {
-        my @lines = $self->{formatter}->format($self->{width}, $self->{table});
+        my $formatter = Ember::Format::KeyValue->new($self->{width});
+        my @lines = $formatter->format($self->{table});
 
         $self->{lines} = \@lines;
     }

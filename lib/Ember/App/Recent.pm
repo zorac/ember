@@ -22,9 +22,6 @@ use warnings;
 use base qw( Ember::App::Selector );
 use fields qw( ids );
 
-use Ember::Format::KeyValue;
-use Ember::Format::Text;
-
 =head2 Fields
 
 =over

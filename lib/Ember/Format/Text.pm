@@ -20,63 +20,61 @@ use base qw( Ember::Format );
 
 =over
 
-=item format($width, $input)
+=item format($input)
 
-Format some plain text into an array of lines with a given maximum length.
+Format some plain text into an array of lines with a maximum length.
 
 =cut
 
 sub format {
-    my ($self, $width, $input) = @_;
-    my $current = '';
-    my $clen = 0;
-    my @output;
+    my ($self, $input) = @_;
+    my $width = $self->{width};
+    my $line = '';
+    my $llen = 0;
+    my @lines;
 
-    foreach my $line (split(/\r?\n/, $input)) {
-        my @words = split(/\s+/, $line);
+    foreach my $in (split(/\r?\n/, $input)) {
+        my @words = split(/\s+/, $in);
 
         if (@words == 0) {
-            if ($clen > 0) {
-                push(@output, $current);
-                $current = '';
-                $clen = 0;
+            if ($llen > 0) {
+                push(@lines, $line);
+                $line = '';
+                $llen = 0;
             }
 
-            push(@output, '') if (@output);
+            push(@lines, '') if (@lines);
             next;
         }
 
         foreach my $word (@words) {
             my $wlen = length($word);
 
-            if (($clen > 0) && (($clen + $wlen) >= $width)) {
-                push(@output, $current);
-                $current = '';
-                $clen = 0;
+            if (($llen > 0) && (($llen + $wlen) >= $width)) {
+                push(@lines, $line);
+                $line = '';
+                $llen = 0;
             }
 
             while ($wlen > $width) {
-                push(@output, substr($word, 0, $width, ''));
+                push(@lines, substr($word, 0, $width, ''));
                 $wlen -= $width;
             }
 
-            if ($clen == 0) {
-                $current = $word;
-                $clen = $wlen;
+            if ($llen == 0) {
+                $line = $word;
+                $llen = $wlen;
             } else {
-                $current .= ' ' . $word;
-                $clen += 1 + $wlen;
+                $line .= ' ' . $word;
+                $llen += 1 + $wlen;
             }
         }
     }
 
-    if ($clen == 0) {
-        pop(@output);
-    } else {
-        push(@output, $current);
-    }
+    push(@lines, $line) if ($llen > 0);
+    pop(@lines) while (@lines && $lines[$#lines] eq '');
 
-    return @output;
+    return @lines;
 }
 
 =back

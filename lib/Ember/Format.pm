@@ -14,24 +14,38 @@ text for CLI display.
 use 5.008;
 use strict;
 use warnings;
-use fields;
+use fields qw( width );
 
 use Carp;
+
+=back
+
+=head2 Fields
+
+=over
+
+=item width
+
+The width text should be formatted to fit in.
+
+=back
 
 =head2 Class Methods
 
 =over
 
-=item new()
+=item new($width)
 
-Create a new formatter. You should call this directly on a subclass if you want
-an object which is actually useful.
+Create a new formatter for a given screen width in characters. You should call
+this directly on a subclass if you want an object which is actually useful.
 
 =cut
 
 sub new {
-    my ($class) = @_;
+    my ($class, $width) = @_;
     my $self = fields::new($class);
+
+    $self->{width} = $width;
 
     return $self;
 }
@@ -42,15 +56,14 @@ sub new {
 
 =over
 
-=item format($width, $input)
+=item format($input)
 
-Must be implemented by sub-classes to format text lines for the given input,
-restricted to a given display width in characters.
+Must be implemented by sub-classes to format text lines for the given input.
 
 =cut
 
 sub format {
-    my ($self, $width, $input) = @_;
+    my ($self, $input) = @_;
 
     croak(ref($self) . ' has not implemented format()');
 }

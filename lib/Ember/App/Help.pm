@@ -20,7 +20,7 @@ use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::App::Pager );
-use fields qw( text keys text_formatter table_formatter );
+use fields qw( text keys );
 
 use Ember::Format::KeyValue;
 use Ember::Format::Text;
@@ -36,14 +36,6 @@ The help text.
 =item keys
 
 The supported keypresses.
-
-=item text_formatter
-
-The text formatter to use.
-
-=item table_formatter
-
-The table formatter to use.
 
 =back
 
@@ -72,8 +64,6 @@ sub new {
 
     $self->{text} = $text;
     $self->{keys} = $args->{app}->help_keys();
-    $self->{text_formatter} = Ember::Format::Text->new();
-    $self->{table_formatter} = Ember::Format::KeyValue->new();
 
     return $self;
 }
@@ -95,8 +85,11 @@ sub layout {
 
     if ($width_changed) {
         my $width = $self->{width};
-        my @lines = ( $self->{text_formatter}->format($width, $self->{text}),
-            '', $self->{table_formatter}->format($width, $self->{keys}) );
+        my $text_formatter = Ember::Format::Text->new($width);
+        my $table_formatter = Ember::Format::KeyValue->new($width);
+
+        my @lines = ( $text_formatter->format($self->{text}),
+            '', $table_formatter->format($self->{keys}) );
 
         $self->{lines} = \@lines;
     }

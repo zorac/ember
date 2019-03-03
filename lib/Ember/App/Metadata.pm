@@ -20,7 +20,7 @@ use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::App::Pager );
-use fields qw( table table_formatter text text_formatter );
+use fields qw( table text );
 
 use Ember::Format::KeyValue;
 use Ember::Format::Text;
@@ -33,17 +33,9 @@ use Ember::Format::Text;
 
 The metadata table to display.
 
-=item table_formatter
-
-The table formatter to use.
-
 =item text
 
 The metadata text to display.
-
-=item text_formatter
-
-The text formatter to use.
 
 =back
 
@@ -67,12 +59,10 @@ sub new {
             my $text = pop(@meta);
 
             $self->{text} = $text->[1];
-            $self->{text_formatter} = Ember::Format::Text->new();
         }
 
         if (@meta) {
             $self->{table} = \@meta;
-            $self->{table_formatter} = Ember::Format::KeyValue->new();
         }
     }
 
@@ -100,11 +90,19 @@ sub layout {
         my $text = $self->{text};
         my @lines;
 
-        push(@lines, $self->{table_formatter}->format($width, $table))
-            if ($table);
+        if ($table) {
+            my $formatter = Ember::Format::KeyValue->new($width);
+
+            push(@lines, $formatter->format($table));
+        }
+
         push(@lines, '') if ($table && $text);
-        push(@lines, $self->{text_formatter}->format($width, $text))
-            if ($text);
+
+        if ($text) {
+            my $formatter = Ember::Format::Text->new($width);
+
+            push(@lines, $formatter->format($text));
+        }
 
         $self->{lines} = \@lines;
     }

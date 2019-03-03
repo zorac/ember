@@ -14,7 +14,7 @@ use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::Format );
-use fields qw( width lines line llen space hlen );
+use fields qw( lines line llen space hlen );
 
 use HTML::TreeBuilder 5 -weak;
 
@@ -69,10 +69,6 @@ our %HEADER = (
 
 =over
 
-=item width
-
-The width text should be formatted to fit in.
-
 =item lines
 
 The formatted lines of text during formatting.
@@ -99,18 +95,17 @@ The length of a heading being processed.
 
 =over
 
-=item format($width, $input)
+=item format($input)
 
-Format HTML text into an array of lines with a given maximum length.
+Format HTML text into an array of lines with a maximum length.
 
 =cut
 
 sub format {
-    my ($self, $width, $input) = @_;
+    my ($self, $input) = @_;
     my $tree = HTML::TreeBuilder->new();
     my @lines;
 
-    $self->{width} = $width;
     $self->{lines} = \@lines;
     $self->{line} = '';
     $self->{llen} = 0;
@@ -129,14 +124,12 @@ sub format {
 
     $self->process($tree);
     $self->newline();
+    pop(@lines) while (@lines && $lines[$#lines] eq '');
 
     undef($self->{lines});
     undef($self->{line});
     undef($self->{llen});
-
-    while ($lines[$#lines] eq '') {
-        pop(@lines);
-    }
+    undef($self->{space});
 
     return @lines;
 }

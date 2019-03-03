@@ -15,55 +15,23 @@ use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::Format );
-use fields qw( splitter );
 
 use Ember::Format::Text;
-
-=head2 Fields
-
-=over
-
-=item splitter
-
-A text formatter used to split values into lines.
-
-=back
-
-=head2 Class Methods
-
-=over
-
-=item new()
-
-Create a new key/value formatter.
-
-=cut
-
-sub new {
-    my ($class) = @_;
-    my $self = $class->SUPER::new();
-
-    $self->{splitter} = Ember::Format::Text->new();
-
-    return $self;
-}
-
-=back
 
 =head2 Instance Methods
 
 =over
 
-=item format($width, $input)
+=item format($input)
 
-Format into an array of lines with a given maximum length. Input should be an
-array in the format [ [ $key, $value ], ... ].
+Format into an array of lines with a maximum length. Input should be an array
+in the format [ [ $key, $value ], ... ].
 
 =cut
 
 sub format {
-    my ($self, $width, $input) = @_;
-    my $splitter = $self->{splitter};
+    my ($self, $input) = @_;
+    my $width = $self->{width};
     my $keywidth = 0;
     my @rows;
 
@@ -73,28 +41,31 @@ sub format {
     }
 
     if ($keywidth >= ($width / 3)) {
+        my $format = Ember::Format::Text->new($width);
+
         foreach my $row (@{$input}) {
-            push(@rows, $splitter->format($width, $row->[0] . ':'));
-            push(@rows, $splitter->format($width, $row->[1]));
+            push(@rows, $format->format($row->[0] . ':'));
+            push(@rows, $format->format($row->[1]));
             push(@rows, '');
         }
 
         pop(@rows);
     } else {
-        my $valwidth = $width - ($keywidth + 2);
+        my $key_format = Ember::Format::Text->new($keywidth);
+        my $value_format = Ember::Format::Text->new($width - ($keywidth + 2));
         my $fmta = '%' . $keywidth . 's: %s';
         my $fmtb = '%' . $keywidth . 's  %s';
 
         foreach my $row (@{$input}) {
-            my @keys = $splitter->format($keywidth, $row->[0]);
-            my @vals = $splitter->format($valwidth, $row->[1]);
-            my $count = (@keys > @vals) ? @keys : @vals;
+            my @keys = $key_format->format($row->[0]);
+            my @values = $value_format->format($row->[1]);
+            my $count = (@keys > @values) ? @keys : @values;
 
             for (my $i = 0; $i < $count; $i++) {
                 my $key = $keys[$i] || '';
 
                 push(@rows, sprintf(($i || ($key eq '')) ? $fmtb : $fmta,
-                    $key, $vals[$i] || ''));
+                    $key, $values[$i] || ''));
             }
         }
     }

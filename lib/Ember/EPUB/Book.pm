@@ -14,10 +14,9 @@ use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::Book );
-use fields qw( manifest rootpath formatter );
+use fields qw( manifest rootpath );
 
 use Ember::EPUB::Chapter;
-use Ember::Format::HTML;
 use Ember::Metadata::OPF;
 
 =head2 Fields
@@ -31,10 +30,6 @@ Stores manifest data from the EPUB file.
 =item rootpath
 
 The root path within the EPUB file.
-
-=item formatter
-
-The formatter instance used to format chapters.
 
 =back
 
@@ -57,7 +52,6 @@ sub new {
     return undef if (!$mime || ($mime !~ /application\/epub\+zip/i));
 
     my $self = $class->SUPER::new($args);
-    my $formatter = Ember::Format::HTML->new();
     my $container = $vfs->read_xml('META-INF/container.xml');
     my $opf_file = $container->{rootfiles}{rootfile}{'full-path'};
     my ($root_path) = ($opf_file =~ /^(.*?)[^\/]*$/);
@@ -111,7 +105,6 @@ sub new {
     $self->{manifest} = \%manifest;
     $self->{chapters} = \@chapters;
     $self->{rootpath} = $root_path;
-    $self->{formatter} = $formatter;
 
     return $self;
 }

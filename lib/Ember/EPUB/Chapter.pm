@@ -15,6 +15,8 @@ use strict;
 use warnings;
 use base qw( Ember::Chapter );
 
+use Ember::Format::HTML;
+
 =head2 Instance Methods
 
 =over
@@ -22,7 +24,7 @@ use base qw( Ember::Chapter );
 =item lines($width)
 
 Find the HTML file for this chapter, render it into text of the given width,
-and return an array of line.
+and return an array of lines.
 
 =cut
 
@@ -31,8 +33,9 @@ sub lines {
     my $book = $self->{book};
     my $path = $book->{rootpath} . $self->{path};
     my $content = $book->{vfs}->read_text($path);
+    my $formatter = Ember::Format::HTML->new($width);
 
-    return $book->{formatter}->format($width, $content);
+    return $formatter->format($content);
 }
 
 =back
