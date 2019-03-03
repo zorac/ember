@@ -21,7 +21,9 @@ Ember script to dump an ebook.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( book );
+use fields qw( book width );
+
+use POSIX qw( floor ceil );
 
 use Ember::Book;
 use Ember::Config;
@@ -33,6 +35,10 @@ use Ember::Config;
 =item book
 
 The book to be dumped.
+
+=item width
+
+The width of the dump, in characters.
 
 =back
 
@@ -49,8 +55,12 @@ Create a new script object by passing an L<Ember::Args> object.
 sub new {
     my ($class, $args) = @_;
     my $self = fields::new($class);
+    my $width = $args->{width};
+
+    $width = 80 if (!defined($width) || ($width < 1));
 
     $self->{book} = Ember::Book->open($args->{dump}, Ember::Config->open());
+    $self->{width} = $width;
 
     return $self;
 }
@@ -70,7 +80,12 @@ Run the reader application.
 sub run {
     my ($self) = @_;
     my $book = $self->{book};
+    my $width = $self->{width};
     my $first = 1;
+    my $divider = ($/ x 2)
+        . (' ' x floor($width / 3))
+        . ('~' x ceil($width / 3))
+        . ($/ x 3);
 
     binmode(STDOUT, ':utf8');
 
@@ -80,10 +95,10 @@ sub run {
         if ($first) {
             $first = 0;
         } else {
-            print $/, $/, ' ' x 30, '~' x 20, $/, $/, $/;
+            print $divider;
         }
 
-        foreach my $line ($chapter->lines(80)) { # TODO make that configurable
+        foreach my $line ($chapter->lines($width)) {
             print $line, $/;
         }
     }
