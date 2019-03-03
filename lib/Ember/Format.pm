@@ -18,8 +18,6 @@ use fields qw( width );
 
 use Carp;
 
-=back
-
 =head2 Fields
 
 =over

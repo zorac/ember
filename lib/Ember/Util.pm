@@ -21,7 +21,7 @@ our @EXPORT = qw( get_class );
 
 =over
 
-=item get_class($type, $name)
+=item get_class([$type [, $name]])
 
 Fetch the Ember class with the given type and name, loading the module if
 needed.
@@ -29,10 +29,17 @@ needed.
 =cut
 
 sub get_class {
-    my ($type, $name) = @_;
+    my $file = 'Ember';
+    my $class = 'Ember';
 
-    require 'Ember/' . $type . '/' . $name . '.pm';
-    return 'Ember::' . $type . '::' . $name;
+    foreach my $part (@_) {
+        $file .= '/' . $part;
+        $class .= '::' . $part;
+    }
+
+    require "$file.pm";
+
+    return $class;
 }
 
 =back

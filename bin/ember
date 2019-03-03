@@ -23,24 +23,27 @@ use Carp qw( cluck confess verbose );
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
+use Ember::Args;
+use Ember::Util;
+
 $SIG{__DIE__} = \&confess;
 $SIG{__WARN__} = \&cluck;
 
 eval {
-    require Ember::Args;
-
     my $args = Ember::Args->new(@ARGV);
-    my $app;
+    my $class;
 
     if ($args->{dump}) {
-        require Ember::Script::Dump;
-
-        $app = Ember::Script::Dump->new($args);
+        $class = get_class('Script', 'Dump');
+    } elsif ($args->{help}) {
+        $class = get_class('Script', 'Help');
+    } elsif ($args->{version}) {
+        $class = get_class('Script', 'Version');
     } else {
-        require Ember;
-
-        $app = Ember->new($args);
+        $class = get_class();
     }
+
+    my $app = $class->new($args);
 
     $app->run();
 }; if ($@) {

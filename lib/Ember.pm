@@ -21,12 +21,12 @@ This class is the entrypoint for the Ember application.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( config screen app stack );
+use base qw( Ember::Script );
+use fields qw( screen app stack );
 
 use Carp;
 
 use Ember::Book;
-use Ember::Config;
 use Ember::Screen;
 use Ember::Util;
 
@@ -40,17 +40,13 @@ The current version number for Ember.
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =back
 
 =head2 Fields
 
 =over
-
-=item config
-
-A configuration instance.
 
 =item screen
 
@@ -78,9 +74,8 @@ Create a new application object by passing an L<Ember::Args> object.
 
 sub new {
     my ($class, $args) = @_;
-    my $self = fields::new($class);
+    my $self = $class->SUPER::new($args);
 
-    $self->{config} = Ember::Config->open();
     $self->{screen} = Ember::Screen->new();
     $self->{stack} = [];
 
@@ -207,8 +202,8 @@ sub pop_app {
 
 =head1 SEE ALSO
 
-L<ember>, L<Ember::Args>, L<Ember::Screen>, L<Ember::App>, L<Ember::Config>,
-L<Ember::Book>
+L<ember>, L<Ember::Args>, L<Ember::Script>, L<Ember::Screen>, L<Ember::App>,
+L<Ember::Config>, L<Ember::Book>
 
 =head1 AUTHOR
 

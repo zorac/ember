@@ -2,7 +2,7 @@ package Ember::Script::Dump;
 
 =head1 NAME
 
-Ember - A CLI-based reader for eBooks.
+Ember::Script::Dump - Dump an eBook to plain text.
 
 =head1 SYNOPSIS
 
@@ -14,19 +14,19 @@ $ember->run();
 
 =head1 DESCRIPTION
 
-Ember script to dump an ebook.
+Ember script to dump an eBook.
 
 =cut
 
 use 5.008;
 use strict;
 use warnings;
+use base qw( Ember::Script );
 use fields qw( book width );
 
 use POSIX qw( floor ceil );
 
 use Ember::Book;
-use Ember::Config;
 
 =head2 Fields
 
@@ -54,12 +54,12 @@ Create a new script object by passing an L<Ember::Args> object.
 
 sub new {
     my ($class, $args) = @_;
-    my $self = fields::new($class);
+    my $self = $class->SUPER::new($args);
     my $width = $args->{width};
 
     $width = 80 if (!defined($width) || ($width < 1));
 
-    $self->{book} = Ember::Book->open($args->{dump}, Ember::Config->open());
+    $self->{book} = Ember::Book->open($args->{dump}, $self->{config});
     $self->{width} = $width;
 
     return $self;
@@ -73,7 +73,7 @@ sub new {
 
 =item run()
 
-Run the reader application.
+Dump the contents of the requested book.
 
 =cut
 
@@ -108,7 +108,7 @@ sub run {
 
 =head1 SEE ALSO
 
-L<ember>, L<Ember::Args>, L<Ember::Book>
+L<ember>, L<Ember::Args>, L<Ember::Book>, L<Ember::Script>
 
 =head1 AUTHOR
 

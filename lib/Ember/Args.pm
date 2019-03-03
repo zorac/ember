@@ -19,7 +19,7 @@ This class is the entrypoint for the Ember application.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( book dump width );
+use fields qw( book dump help version width );
 
 use Getopt::Long;
 
@@ -34,6 +34,14 @@ The filename of a book to read.
 =item dump
 
 The filename of a book to dump.
+
+=item help
+
+If set, display help for Ember, then exit.
+
+=item version
+
+If set, display the version of Ember, then exit.
 
 =item width
 
@@ -56,9 +64,11 @@ sub new {
     my $self = fields::new($class);
     my $parser = Getopt::Long::Parser->new();
 
-    $parser->getoptionsfromarray(\@args, $self,
+    exit(1) unless $parser->getoptionsfromarray(\@args, $self,
         'book|b=s',
         'dump|d=s',
+        'help|h',
+        'version|v',
         'width|w=i',
     );
 
