@@ -19,20 +19,23 @@ use 5.008;
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
 
-use Carp qw( cluck confess verbose );
+use Carp;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use Ember::Args;
 use Ember::Util;
 
-$SIG{__DIE__} = \&confess;
-$SIG{__WARN__} = \&cluck;
+my $args = Ember::Args->new(@ARGV);
+my ($class, $app);
+
+if ($args->{debug}) {
+    $Carp::Verbose = 1;
+    $SIG{__DIE__} = \&confess;
+    $SIG{__WARN__} = \&cluck;
+}
 
 eval {
-    my $args = Ember::Args->new(@ARGV);
-    my $class;
-
     if ($args->{dump}) {
         $class = get_class('Script', 'Dump');
     } elsif ($args->{help}) {
@@ -43,10 +46,11 @@ eval {
         $class = get_class();
     }
 
-    my $app = $class->new($args);
-
+    $app = $class->new($args);
     $app->run();
 }; if ($@) {
+    undef($app); # Make it die!
+
     if ($@ =~ /^Can't locate \S+ in \@INC \(you may need to install the (\S+) module\)/) {
         print STDERR <<"EOF";
 

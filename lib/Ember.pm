@@ -76,7 +76,7 @@ sub new {
     my ($class, $args) = @_;
     my $self = $class->SUPER::new($args);
 
-    $self->{screen} = Ember::Screen->new();
+    $self->{screen} = Ember::Screen->new($args->{debug});
     $self->{stack} = [];
 
     if ($args->{book}) {

@@ -45,21 +45,22 @@ our %KEYMAP = (
 
 =over
 
-=item new()
+=item new($debug)
 
 Create a new screen object, and initialise the display.
 
 =cut
 
 sub new {
-    my ($class) = @_;
+    my ($class, $debug) = @_;
     my $self = fields::new($class);
 
     binmode(STDOUT, ':utf8');
     ReadMode('cbreak');
     $self->{termcap} = Term::Cap->Tgetent();
     $self->{termcap}->Trequire(qw( cl cm ));
-    $self->{termcap}->Tputs('ti', 1, *STDOUT);
+    # Don't enable full-screen mode if we're debugging as it zaps error messages
+    $self->{termcap}->Tputs('ti', 1, *STDOUT) if (!$debug);
 
     return $self;
 }
