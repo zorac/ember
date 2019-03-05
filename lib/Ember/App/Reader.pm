@@ -74,11 +74,7 @@ Layout the current chapter for the current screen size.
 sub layout {
     my ($self, $changed) = @_;
 
-    if ($changed) {
-        my @lines = $self->{chapter}->lines($self->{width});
-
-        $self->{lines} = \@lines;
-    }
+    $self->set_line_data($self->{chapter}->data($self->{width})) if ($changed);
 
     $self->SUPER::layout();
 }

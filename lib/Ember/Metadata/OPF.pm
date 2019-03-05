@@ -30,7 +30,7 @@ Create a new OPF metadata object, given a hashref of parsed OPF XML.
 sub new {
     my ($class, $opf) = @_;
     my $self = $class->SUPER::new();
-    my $formatter = Ember::Format::HTML->new(999999); # We just want text
+    my $format = Ember::Format::HTML->new(999999); # We just want text
     my %metadata;
 
     $self->parse(\%metadata, $opf->{metadata}{meta});
@@ -64,7 +64,7 @@ sub new {
     }
 
     if ($metadata{description}) {
-        my @lines = $formatter->format($metadata{description}[0]{content});
+        my @lines = $format->lines($metadata{description}[0]{content});
 
         $self->{description} = join("\n", @lines);
     }

@@ -6,7 +6,7 @@ Ember::Format::Text - Text conversion and formatting.
 
 =head1 DESCRIPTION
 
-This formatter handles plain-text content. It assumes blank lines between
+This format handles plain-text content. It assumes blank lines between
 paragraphs.
 
 =cut
@@ -20,13 +20,13 @@ use base qw( Ember::Format );
 
 =over
 
-=item format($input)
+=item lines($input)
 
 Format some plain text into an array of lines with a maximum length.
 
 =cut
 
-sub format {
+sub lines {
     my ($self, $input) = @_;
     my $width = $self->{width};
     my $line = '';

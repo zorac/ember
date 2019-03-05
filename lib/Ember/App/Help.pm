@@ -85,13 +85,15 @@ sub layout {
 
     if ($width_changed) {
         my $width = $self->{width};
-        my $text_formatter = Ember::Format::Text->new($width);
-        my $table_formatter = Ember::Format::KeyValue->new($width);
+        my $text_format = Ember::Format::Text->new($width);
+        my $table_format = Ember::Format::KeyValue->new($width);
 
-        my @lines = ( $text_formatter->format($self->{text}),
-            '', $table_formatter->format($self->{keys}) );
+        my @lines = ( $text_format->lines($self->{text}),
+            '', $table_format->lines($self->{keys}) );
 
         $self->{lines} = \@lines;
+        $self->{line_count} = @lines;
+        $self->{line_pos} = [ 0 .. $#lines ]; # TODO make less hacky?
     }
 
     $self->SUPER::layout();

@@ -73,10 +73,9 @@ sub layout {
     my ($self, $width_changed) = @_;
 
     if ($width_changed) {
-        my $formatter = Ember::Format::KeyValue->new($self->{width});
-        my @lines = $formatter->format($self->{table});
+        my $format = Ember::Format::KeyValue->new($self->{width});
 
-        $self->{lines} = \@lines;
+        $self->set_line_data($format->data($self->{table}))
     }
 
     $self->SUPER::layout();

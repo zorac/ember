@@ -21,21 +21,22 @@ use Ember::Format::HTML;
 
 =over
 
-=item lines($width)
+=item data($width)
 
 Find the HTML file for this chapter, render it into text of the given width,
-and return an array of lines.
+and return the lines and other data. Return value is the same format as the
+data(...) method in L<Ember::Format>.
 
 =cut
 
-sub lines {
+sub data {
     my ($self, $width) = @_;
     my $book = $self->{book};
     my $path = $book->{rootpath} . $self->{path};
     my $content = $book->{vfs}->read_text($path);
-    my $formatter = Ember::Format::HTML->new($width);
+    my $format = Ember::Format::HTML->new($width);
 
-    return $formatter->format($content);
+    return $format->data($content);
 }
 
 =back

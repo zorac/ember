@@ -14,7 +14,7 @@ use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::App );
-use fields qw( pos lines lines_pos line_count page page_size page_count
+use fields qw( pos lines line_pos line_count page page_size page_count
         footer );
 
 =head2 Fields
@@ -29,7 +29,7 @@ The current reading position within the content.
 
 The formatted text lines of the content.
 
-=item lines_pos
+=item line_pos
 
 The reading position corresponding to each line of the content.
 
@@ -72,8 +72,8 @@ sub new {
 
     $self->{pos} = $args->{pos} || 0;
     $self->{lines} = [];
-    $self->{lines_pos} = [];
     $self->{line_count} = 0;
+    $self->{line_pos} = [];
     $self->{page} = 1;
     $self->{page_size} = 0;
     $self->{page_count} = 1;
@@ -90,26 +90,18 @@ sub new {
 =item layout($width_changed, $height_changed)
 
 Layout the content for the current screen size. Subclasses should normally
-regenerate $self->{lines} (only if the width has changed), and then call:
-    $self->SUPER::layout();
+regenerate the fields 'lines', 'line_count', and 'line_pos' (generally only if
+the width has changed), and then call: $self->SUPER::layout();
 
 =cut
 
 sub layout {
     my ($self) = @_;
     my $size = $self->{height} - 1;
-    my @lines = @{$self->{lines}};
-    my $page_count = (@lines == 0) ? 1 : int((@lines + $size - 1) / $size);
-    my @lines_pos;
-    my $pos = 0;
+    my $line_count = $self->{line_count};
+    my $page_count = ($line_count == 0) ? 1
+        : int(($line_count + $size - 1) / $size);
 
-    foreach my $line (@lines) {
-        push(@lines_pos, $pos);
-        $pos += split(' ', $line);
-    }
-
-    $self->{lines_pos} = \@lines_pos;
-    $self->{line_count} = @lines;
     $self->{page_size} = $size;
     $self->{page_count} = $page_count;
 
@@ -120,7 +112,7 @@ sub layout {
     }
 
     for (my $page = 1; $page < $page_count; $page++) {
-        if ($self->{pos} < $lines_pos[$page * $size]) {
+        if ($self->{pos} < $self->{line_pos}[$page * $size]) {
             $self->{page} = $page;
             return;
         }
@@ -144,7 +136,7 @@ sub render {
 
     $last = $self->{line_count} if ($last > $self->{line_count});
 
-    $self->{pos} = $self->{lines_pos}[$first];
+    $self->{pos} = $self->{line_pos}[$first];
     $self->{screen}->clear_screen();
 
     for (my $line = $first; $line < $last; $line++) {
@@ -188,6 +180,21 @@ sub help_keys {
     );
 
     return $keys;
+}
+
+=item set_line_data($data)
+
+Shortcut to set the line data for this pager. Input format is the same as the
+ouput format for the data() method in L<Ember::Format>.
+
+=cut
+
+sub set_line_data {
+    my ($self, $data) = @_;
+
+    $self->{lines} = $data->{lines};
+    $self->{line_count} = $data->{line_count};
+    $self->{line_pos} = $data->{line_pos};
 }
 
 =item footer([ $text [, $persist ] ])

@@ -91,20 +91,22 @@ sub layout {
         my @lines;
 
         if ($table) {
-            my $formatter = Ember::Format::KeyValue->new($width);
+            my $format = Ember::Format::KeyValue->new($width);
 
-            push(@lines, $formatter->format($table));
+            push(@lines, $format->lines($table));
         }
 
         push(@lines, '') if ($table && $text);
 
         if ($text) {
-            my $formatter = Ember::Format::Text->new($width);
+            my $format = Ember::Format::Text->new($width);
 
-            push(@lines, $formatter->format($text));
+            push(@lines, $format->lines($text));
         }
 
         $self->{lines} = \@lines;
+        $self->{line_count} = @lines;
+        $self->{line_pos} = [ 0 .. $#lines ]; # TODO make less hacky?
     }
 
     $self->SUPER::layout();

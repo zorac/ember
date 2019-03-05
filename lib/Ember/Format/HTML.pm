@@ -6,7 +6,7 @@ Ember::Format::HTML - HTML conversion and formatting.
 
 =head1 DESCRIPTION
 
-This formatter converts HTML files into plain text.
+This format converts HTML files into plain text.
 
 =cut
 
@@ -95,13 +95,13 @@ The length of a heading being processed.
 
 =over
 
-=item format($input)
+=item lines($input)
 
 Format HTML text into an array of lines with a maximum length.
 
 =cut
 
-sub format {
+sub lines {
     my ($self, $input) = @_;
     my $tree = HTML::TreeBuilder->new();
     my @lines;

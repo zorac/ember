@@ -6,7 +6,7 @@ Ember::Format::KeyValue - Formats a collection of keys and values for display.
 
 =head1 DESCRIPTION
 
-This formatter converts a collection of keys and values into a plain-text
+This format converts a collection of keys and values into a plain-text
 table.
 
 =cut
@@ -22,14 +22,14 @@ use Ember::Format::Text;
 
 =over
 
-=item format($input)
+=item lines($input)
 
 Format into an array of lines with a maximum length. Input should be an array
 in the format [ [ $key, $value ], ... ].
 
 =cut
 
-sub format {
+sub lines {
     my ($self, $input) = @_;
     my $width = $self->{width};
     my $keywidth = 0;
@@ -44,8 +44,8 @@ sub format {
         my $format = Ember::Format::Text->new($width);
 
         foreach my $row (@{$input}) {
-            push(@rows, $format->format($row->[0] . ':'));
-            push(@rows, $format->format($row->[1]));
+            push(@rows, $format->lines($row->[0] . ':'));
+            push(@rows, $format->lines($row->[1]));
             push(@rows, '');
         }
 
@@ -57,8 +57,8 @@ sub format {
         my $fmtb = '%' . $keywidth . 's  %s';
 
         foreach my $row (@{$input}) {
-            my @keys = $key_format->format($row->[0]);
-            my @values = $value_format->format($row->[1]);
+            my @keys = $key_format->lines($row->[0]);
+            my @values = $value_format->lines($row->[1]);
             my $count = (@keys > @values) ? @keys : @values;
 
             for (my $i = 0; $i < $count; $i++) {
