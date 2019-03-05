@@ -20,6 +20,7 @@ lib/Ember/Config/Windows.pm
 lib/Ember/EPUB/Book.pm
 lib/Ember/EPUB/Chapter.pm
 lib/Ember/Format.pm
+lib/Ember/Format/Document.pm
 lib/Ember/Format/HTML.pm
 lib/Ember/Format/KeyValue.pm
 lib/Ember/Format/Text.pm

@@ -14,67 +14,25 @@ paragraphs.
 use 5.008;
 use strict;
 use warnings;
-use base qw( Ember::Format );
+use base qw( Ember::Format::Document );
 
 =head2 Instance Methods
 
 =over
 
-=item lines($input)
+=item render($input)
 
-Format some plain text into an array of lines with a maximum length.
+Render a plain text document
 
 =cut
 
-sub lines {
+sub render {
     my ($self, $input) = @_;
-    my $width = $self->{width};
-    my $line = '';
-    my $llen = 0;
-    my @lines;
 
-    foreach my $in (split(/\r?\n/, $input)) {
-        my @words = split(/\s+/, $in);
-
-        if (@words == 0) {
-            if ($llen > 0) {
-                push(@lines, $line);
-                $line = '';
-                $llen = 0;
-            }
-
-            push(@lines, '') if (@lines);
-            next;
-        }
-
-        foreach my $word (@words) {
-            my $wlen = length($word);
-
-            if (($llen > 0) && (($llen + $wlen) >= $width)) {
-                push(@lines, $line);
-                $line = '';
-                $llen = 0;
-            }
-
-            while ($wlen > $width) {
-                push(@lines, substr($word, 0, $width, ''));
-                $wlen -= $width;
-            }
-
-            if ($llen == 0) {
-                $line = $word;
-                $llen = $wlen;
-            } else {
-                $line .= ' ' . $word;
-                $llen += 1 + $wlen;
-            }
-        }
+    foreach my $paragraph (split(/\s*\n\s*\n\s*/, $input)) {
+        $self->newline(2);
+        $self->render_text($paragraph);
     }
-
-    push(@lines, $line) if ($llen > 0);
-    pop(@lines) while (@lines && $lines[$#lines] eq '');
-
-    return @lines;
 }
 
 =back
