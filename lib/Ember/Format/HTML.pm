@@ -14,7 +14,7 @@ use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::Format::Document );
-use fields;
+use fields qw( spaced );
 
 use HTML::TreeBuilder 5 -weak;
 
@@ -38,6 +38,12 @@ our %BLOCK = (
     figure      => 1,
     embed       => 1,
     form        => 1, # TODO anything?
+    h1          => 1,
+    h2          => 1,
+    h3          => 1,
+    h4          => 1,
+    h5          => 1,
+    h6          => 1,
     iframe      => 1,
     noscript    => 1,
     object      => 1,
@@ -62,6 +68,37 @@ our %HEADER = (
     h5 => "'",
     h6 => '`'
 );
+
+=back
+
+=head2 Fields
+
+=over
+
+=item spaced
+
+If set, output blank lines between paragraphs instead of indenting.
+
+=back
+
+=head2 Class Methods
+
+=over
+
+=item new($width [, $spaced])
+
+Create a new HTML formatter.
+
+=cut
+
+sub new {
+    my ($class, $width, $spaced) = @_;
+    my $self = $class->SUPER::new($width);
+
+    $self->{spaced} = 1 if ($spaced);
+
+    return $self;
+}
 
 =back
 
@@ -102,17 +139,24 @@ sub render_element {
     my $width = $self->{width};
     my $lines = $self->{lines};
     my $line_pos = $self->{line_pos};
+    my $spaced = $self->{spaced} ? 2 : 0;
     my ($hchar, $sline);
 
     my $tag = $element->tag();
 
-    if ($BLOCK{$tag}) {
-        $self->newline(2);
-    } elsif ($tag eq 'img') {
+    if ($tag eq 'img') {
         my $text = $element->attr('alt'); # TODO or title?
 
-        $text = '[Image]' if (!defined($text));
-        $self->render_text($text);
+        if (defined($text) && ($text ne '')) {
+            $self->render_text($text);
+        } else {
+            my $parent = $element->parent();
+
+            # An image with no alt alone in a block forces a blank line
+            $self->newline(2) if ($parent && $BLOCK{$parent->tag()}
+                    && ($parent->content_list() == 1));
+        }
+
         return;
     } elsif ($tag eq 'br') {
         $self->newline(1);
@@ -125,6 +169,16 @@ sub render_element {
         $sline = @{$lines};
     } elsif ($tag eq 'head') {
         return;
+    } elsif ($BLOCK{$tag}) {
+        $self->newline($spaced);
+
+        if (!$spaced) {
+            my $last = $#{$lines};
+
+            if (($last >= 0) && ($lines->[$last] ne '')) {
+                $self->{indent} = 2;
+            }
+        }
     } # TODO a, pre, blockquote, lists, etc
 
     $element->normalize_content();
@@ -144,6 +198,10 @@ sub render_element {
             splice(@{$lines}, $i + 1, 0, $hchar x length($lines->[$i]));
             splice(@{$line_pos}, $i + 1, 0, $line_pos->[$i]);
         }
+
+        $self->newline(1);
+    } elsif ($BLOCK{$tag}) {
+        $self->newline($spaced);
     }
 }
 

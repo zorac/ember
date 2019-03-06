@@ -156,7 +156,10 @@ sub display {
             }
         } elsif ($hint eq 'hash') {
             foreach my $hkey (sort(keys(%{$value}))) {
-                push(@meta, [ $hkey, $value->{$hkey} ]);
+                my $hval = $value->{$hkey};
+
+                push(@meta, [ $hkey, $hval ])
+                    if (defined($hval) && ($hval ne ''));
             }
         } elsif ($hint eq 'multi') {
             push(@meta, [ undef, $value ]);

@@ -14,9 +14,7 @@ use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::Format );
-use fields qw( lines line_pos anchors pos line llen space );
-
-=back
+use fields qw( lines line_pos anchors pos line llen space indent );
 
 =head2 Fields
 
@@ -50,6 +48,10 @@ The length of the current line of text during formatting.
 
 0 or 1 depending on if we have a space to carry forward.
 
+=item indent
+
+A number of spaces to indent the first line of the next paragraph.
+
 =back
 
 =head2 Instance Methods
@@ -75,6 +77,7 @@ sub data {
     $self->{line} = '';
     $self->{llen} = 0;
     $self->{space} = 0;
+    $self->{indent} = 0;
 
     $self->render($input); # Do the hard work!
 
@@ -100,9 +103,10 @@ sub data {
     undef($self->{line_pos});
     undef($self->{pos});
     undef($self->{anchors});
-    undef($self->{lines});
-    undef($self->{lines});
+    undef($self->{line});
+    undef($self->{llen});
     undef($self->{space});
+    undef($self->{indent});
 
     # And we're done
     return $result;
@@ -139,6 +143,15 @@ sub render_text {
     my $space = ($llen > 0) ? $self->{space} : 1;
     # We want to know if there's leading or trailing space, so we split thusly:
     my @words = split(/\s+/, $text, -1);
+
+    if ($self->{indent}) {
+        if (($llen == 0) && @words) {
+            $llen = $self->{indent};
+            $line = ' ' x $llen;
+        }
+
+        $self->{indent} = 0;
+    }
 
     foreach my $word (@words) {
         my $wlen = length($word);
@@ -212,7 +225,7 @@ line at the start of the document.
 =cut
 
 sub newline {
-    my ($self, $empty) = @_;
+    my ($self, $extra) = @_;
     my $lines = $self->{lines};
     my $line_pos = $self->{line_pos};
 
@@ -221,9 +234,10 @@ sub newline {
         push(@{$line_pos}, $self->{pos});
         $self->{line} = '';
         $self->{llen} = 0;
+        $extra-- if ($extra);
     }
 
-    if ($empty) {
+    if ($extra) {
         my $last = $#{$lines};
 
         if (($last >= 0) && ($lines->[$last] ne '')) {
@@ -231,6 +245,8 @@ sub newline {
             push(@{$line_pos}, $self->{pos});
         }
     }
+
+    $self->{indent} = 0;
 }
 
 =item add_line($line [, $before [, $after]])
