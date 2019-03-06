@@ -101,17 +101,29 @@ sub new {
 
 =over
 
+=item data($width)
+
+Returns data including the lines of text making up the input at this format's
+width. Output is the same as the data(...) method in L<Ember::Format>
+
+=cut
+
+sub data {
+    my ($self, $width) = @_;
+
+    croak(ref($self) . ' has not implemented data()');
+}
+
 =item lines($width)
 
-Must be implemented by sub-classes to fetch or generate the text lines for this
-chapter, restricted to a given display width in characters.
+Return the lines of text for this chapter.
 
 =cut
 
 sub lines {
     my ($self, $width) = @_;
 
-    croak(ref($self) . ' has not implemented lines()');
+    return @{$self->data($width)->{lines}};
 }
 
 =back

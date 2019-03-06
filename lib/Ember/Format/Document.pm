@@ -257,7 +257,7 @@ $before and/or $after to true to ensure empty lines around the inserted line.
 =cut
 
 sub add_line {
-    my ($self, $line, $before, $after);
+    my ($self, $line, $before, $after) = @_;
     my $width = $self->{width};
 
     $line = substr($line, 0, $width) if (length($line) > $width);
