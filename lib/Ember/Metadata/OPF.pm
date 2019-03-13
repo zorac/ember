@@ -33,8 +33,8 @@ sub new {
     my $format = Ember::Format::HTML->new(999999, 1); # We just want text
     my %metadata;
 
-    $self->parse(\%metadata, $opf->{metadata}{meta});
-    $self->parse(\%metadata, $opf->{metadata});
+    $self->parse(\%metadata, $opf->{metadata}[0]{meta});
+    $self->parse(\%metadata, $opf->{metadata}[0]);
 
     $self->{title} = $metadata{title}[0]{content}
         if ($metadata{title});

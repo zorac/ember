@@ -69,6 +69,8 @@ sub data {
     my (@lines, %anchors);
     my @line_pos = ( 0 );
 
+    $input = '' if (!defined($input));
+
     # Initialise the format
     $self->{lines} = \@lines;
     $self->{line_pos} = \@line_pos;

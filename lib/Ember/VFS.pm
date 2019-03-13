@@ -196,7 +196,11 @@ sub _xml {
     my $xml = $self->{xml};
 
     if (!$xml) {
-        $xml = XML::Simple->new();
+        $xml = XML::Simple->new(
+            ForceArray => 1,
+            NormaliseSpace => 2,
+        );
+
         $self->{xml} = $xml;
     }
 
@@ -215,7 +219,7 @@ sub read_xml {
     my $xml = $self->read_text($path);
 
     return unless (defined($xml) && ($xml ne ''));
-    return $self->_xml()->XMLin($xml); # TODO error handling
+    return $self->_xml()->parse_string($xml); # TODO error handling
 }
 
 =item write_xml($path, $content)
