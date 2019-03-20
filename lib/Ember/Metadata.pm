@@ -22,26 +22,69 @@ use fields qw( title title_sort authors author_sort series series_index
 
 =item @FIELDS
 
-Defines the metadata fields which Ember supports. Each entry is an array of
-[ $field, $display_name, $hint ]. Possible values for the hint are 'text',
-'array', 'hash', 'hide' and 'multi.
+Defines the metadata fields which Ember supports.
 
 =cut
 
-our @FIELDS = (
-    [ title         => 'Title',         'text'  ],
-    [ title_sort    => 'Title Sort',    'hide'  ],
-    [ authors       => 'Author',        'array' ],
-    [ author_sort   => 'Author Sort',   'hide'  ],
-    [ series        => 'Series',        'text'  ],
-    [ series_index  => 'In Series',     'text'  ],
-    [ publisher     => 'Publisher',     'text'  ],
-    [ date          => 'Date',          'text'  ],
-    [ copyright     => 'Copyright',     'text'  ],
-    [ language      => 'Language',      'text'  ],
-    [ generator     => 'Generator',     'text'  ],
-    [ ids           => 'IDs',           'hash'  ],
-    [ description   => 'Description',   'multi' ],
+our @FIELDS = qw(
+    title
+    title_sort
+    authors
+    author_sort
+    series
+    series_index
+    publisher
+    date
+    copyright
+    language
+    generator
+    ids
+    description
+);
+
+=item @FIELDS
+
+Speifies the human-readable names for metadata fields.
+
+=cut
+
+our %NAMES = (
+    title           => 'Title',
+    title_sort      => 'Title Sort',
+    authors         => 'Author',
+    author_sort     => 'Author Sort',
+    series          => 'Series',
+    series_index    => 'In Series',
+    publisher       => 'Publisher',
+    date            => 'Date',
+    copyright       => 'Copyright',
+    language        => 'Language',
+    generator       => 'Generator',
+    ids             => 'IDs',
+    description     => 'Description',
+);
+
+=item %TYPES
+
+Specifies the types for a metadataa field: 'text', 'array', 'hash', 'hide' and
+'multi'.
+
+=cut
+
+our %TYPES = (
+    title           => 'text',
+    title_sort      => 'hide',
+    authors         => 'array',
+    author_sort     => 'hide',
+    series          => 'text',
+    series_index    => 'text',
+    publisher       => 'text',
+    date            => 'text',
+    copyright       => 'text',
+    language        => 'text',
+    generator       => 'text',
+    ids             => 'hash',
+    description     => 'multi',
 );
 
 =back
@@ -141,27 +184,28 @@ sub display {
     my ($self) = @_;
     my @meta;
 
-    foreach my $row (@FIELDS) {
-        my ($key, $name, $hint) = @{$row};
-        my $value = $self->{$key};
+    foreach my $field (@FIELDS) {
+        my $name = $NAMES{$field};
+        my $type = $TYPES{$field};
+        my $value = $self->{$field};
 
-        next if (!$value || ($hint eq 'hide'));
+        next if (!$value || ($type eq 'hide'));
 
-        if ($hint eq 'array') {
+        if ($type eq 'array') {
             $name .= 's' if (@{$value} > 1);
             push(@meta, [ $name, $value->[0] ]);
 
             for (my $i = 1; $i < @{$value}; $i++) {
                 push(@meta, [ '', $value->[$i] ]);
             }
-        } elsif ($hint eq 'hash') {
-            foreach my $hkey (sort(keys(%{$value}))) {
-                my $hval = $value->{$hkey};
+        } elsif ($type eq 'hash') {
+            foreach my $key (sort(keys(%{$value}))) {
+                my $hval = $value->{$key};
 
-                push(@meta, [ $hkey, $hval ])
+                push(@meta, [ $key, $hval ])
                     if (defined($hval) && ($hval ne ''));
             }
-        } elsif ($hint eq 'multi') {
+        } elsif ($type eq 'multi') {
             push(@meta, [ undef, $value ]);
         } else {
             push(@meta, [ $name, $value ]);

@@ -1,6 +1,7 @@
 bin/build.PL
 bin/ember
 Changes
+docs/Config.md
 lib/Ember.pm
 lib/Ember/App.pm
 lib/Ember/App/Contents.pm
@@ -28,6 +29,7 @@ lib/Ember/Metadata.pm
 lib/Ember/Metadata/OPF.pm
 lib/Ember/Screen.pm
 lib/Ember/Script.pm
+lib/Ember/Script/BackupConfig.pm
 lib/Ember/Script/Dump.pm
 lib/Ember/Script/Help.pm
 lib/Ember/Script/Version.pm

@@ -19,7 +19,7 @@ This class is the entrypoint for the Ember application.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( book debug dump help version width );
+use fields qw( backup_config book debug dump help version width );
 
 use Getopt::Long;
 
@@ -30,6 +30,10 @@ use Getopt::Long;
 =item book
 
 The filename of a book to read.
+
+=item backup_config
+
+If set, backup the config.
 
 =item debug
 
@@ -70,6 +74,7 @@ sub new {
 
     exit(1) unless $parser->getoptionsfromarray(\@args, $self,
         'book|b=s',
+        'backup_config|backup-config',
         'debug|D',
         'dump|d=s',
         'help|h',

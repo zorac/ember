@@ -36,7 +36,9 @@ if ($args->{debug}) {
 }
 
 eval {
-    if ($args->{dump}) {
+    if ($args->{backup_config}) {
+        $class = get_class('Script', 'BackupConfig');
+    } elsif ($args->{dump}) {
         $class = get_class('Script', 'Dump');
     } elsif ($args->{help}) {
         $class = get_class('Script', 'Help');

@@ -20,18 +20,26 @@ Ember.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( vfs );
+use fields qw( db db_file );
 
+use DB_File;
+use DBM_Filter;
+use File::Spec;
+
+use Ember::Metadata;
 use Ember::Util;
-use Ember::VFS;
 
 =head2 Fields
 
 =over
 
-=item vfs
+=item db
 
-An L<Ember::VFS> instance for the configuration directory.
+The configuration database as a tied hash.
+
+=item db_file
+
+The underlying DB_File object.
 
 =back
 
@@ -49,8 +57,12 @@ simply use the open() method to create a platform-specific instance.
 sub new {
     my ($class, $dir) = @_;
     my $self = fields::new($class);
+    my $file = File::Spec->join($dir, 'ember.db');
+    my %db;
 
-    $self->{vfs} = Ember::VFS->open($dir);
+    $self->{db} = \%db;
+    $self->{db_file} = tie(%db, 'DB_File', $file);
+    $self->{db_file}->Filter_Push('utf8');
 
     return $self;
 }
@@ -83,182 +95,193 @@ sub open {
 
 =over
 
-=item read_json($name, $if_empty)
+=item get_id($path)
 
-Read the contents of the given configuration file and return a reference.
-
-=cut
-
-sub read_json {
-    my ($self, $name, $if_empty) = @_;
-    my $content = $self->{vfs}->read_json("$name.json");
-
-    return defined($content) ? $content : $if_empty;
-}
-
-=item write_json($name, $content)
-
-Write the input to a given configuration file.
-
-=cut
-
-sub write_json {
-    my ($self, $name, $content) = @_;
-
-    $self->{vfs}->write_json("$name.json", $content);
-}
-
-=item get_id($filename)
-
-Fetch the Ember ID for the book with the given filename. In a list context, may
+Fetch the Ember ID for the book at the given file path. In a list context, may
 return a second value which indicates that the ID was newly created.
 
 =cut
 
 sub get_id {
-    my ($self, $filename) = @_;
-    my $to_id = $self->read_json('file_to_id', {});
-    my $id = $to_id->{$filename};
+    my ($self, $path) = @_;
+    my $id = $self->{db}->{"id:$path"};
 
     return $id if ($id);
 
-    my $to_file = $self->read_json('id_to_file', [0]);
+    $id = ($self->{db}->{last_id} || 0) + 1;
 
-    $id = ++$to_file->[0];
-    $to_id->{$filename} = $id;
-    $to_file->[$id] = $filename;
-
-    $self->write_json('file_to_id', $to_id);
-    $self->write_json('id_to_file', $to_file);
+    $self->{db}->{last_id} = $id;
+    $self->{db}->{"id:$path"} = $id;
+    $self->{db}->{"$id:path"} = $path;
 
     return wantarray ? ($id, 1) : $id;
 }
 
-=item get_filename($book_id)
+=item get_filename($id)
 
 Fetch the filename for a given Ember book ID.
 
 =cut
 
 sub get_filename {
-    my ($self, $book_id) = @_;
-    my $to_file = $self->read_json('id_to_file', []);
+    my ($self, $id) = @_;
 
-    return $to_file->[$book_id];
+    return $self->{db}->{"$id:path"};
 }
 
-=item get_pos($book_id)
+=item get_pos($id)
 
 Fetch the last chapter and reading position for a given eBook.
 
 =cut
 
 sub get_pos {
-    my ($self, $book_id) = @_;
-    my $map = $self->read_json('positions', {});
+    my ($self, $id) = @_;
 
-    return exists($map->{$book_id}) ? @{$map->{$book_id}} : ();
+    return ($self->{db}->{"$id:chapter"}, $self->{db}->{"$id:pos"});
 }
 
-=item save_pos($book_id, $chapter_id, $pos)
+=item save_pos($id, $chapter, $pos)
 
 Save the last reading position for a book.
 
 =cut
 
 sub save_pos {
-    my ($self, $book_id, $chapter_id, $pos) = @_;
-    my $map = $self->read_json('positions', {});
+    my ($self, $id, $chapter, $pos) = @_;
 
-    $map->{$book_id} = [ $chapter_id, $pos ];
-    $self->write_json('positions', $map);
+    $self->{db}->{"$id:chapter"} = $chapter;
+    $self->{db}->{"$id:pos"} = $pos;
 }
 
 =item get_recent()
 
-Fetch a list of recently-viewed books. Returns an array of arrays of timestamp
-and book ID.
+Fetch a list of recently-viewed books. Returns an array of book IDs.
 
 =cut
 
 sub get_recent {
     my ($self) = @_;
 
-    return $self->read_json('recent', []);
+    return split(',', $self->{db}->{recent} || '');
 }
 
-=item add_recent($book_id)
+=item add_recent($id)
 
 Add an entry for the given book to the recents list.
 
 =cut
 
 sub add_recent {
-    my ($self, $book_id) = @_;
-    my $recent = $self->read_json('recent', []);
-    my $count = @{$recent};
+    my ($self, $id) = @_;
+    my @recent = $self->get_recent();
+    my $count = @recent;
 
-    if (($count > 0) && ($recent->[0][1] == $book_id)) {
-        $recent->[0][0] = time;
-    } else {
-        for (my $i = 1; $i < $count; $i++) {
-            if ($recent->[$i][1] == $book_id) {
-                splice(@{$recent}, $i, 1);
-                last;
-            }
+    return if (($count > 0) && ($recent[0] == $id));
+
+    for (my $i = 1; $i < $count; $i++) {
+        if ($recent[$i] == $id) {
+            splice(@recent, $i, 1);
+            last;
         }
-
-        unshift(@{$recent}, [ time, $book_id ]);
     }
 
-    $self->write_json('recent', $recent);
+    unshift(@recent, $id);
+    $self->{db}->{recent} = join(',', @recent);
 }
 
-=item get_metadata([ $book_id ])
+=item get_metadata($id [, @fields])
 
-Fetch metadata for a book, or for all books;
+Fetch metadata for a book. If I<@fields> is given, returns an array with the
+values of those fields, otherwise, returns an L<Ember::Metadata> object for the
+book.
 
 =cut
 
 sub get_metadata {
-    my ($self, $book_id) = @_;
-    my $cache = $self->read_json('metadata', []);
+    my ($self, $id, @fields) = @_;
+    my ($metadata, @values);
+    my $db = $self->{db};
 
-    return $cache if (!$book_id);
-    return $cache->{$book_id} if (exists($cache->[$book_id]));
-    return {};
+    if (!@fields) {
+        @fields = @Ember::Metadata::FIELDS;
+        $metadata = Ember::Metadata->new();
+    }
+
+    foreach my $field (@fields) {
+        my $type = $Ember::Metadata::TYPES{$field};
+        my $value = $db->{"$id:$field"};
+
+        if ($type eq 'array') {
+            $value = defined($value) ? [ split(/\0/, $value) ] : [];
+        } elsif ($type eq 'hash') {
+            $value = defined($value) ? { split(/\0/, $value) } : {};
+        } elsif (!defined($value)) {
+            $value = '';
+        }
+
+        if ($metadata) {
+            $metadata->{$field} = $value;
+        } else {
+            push(@values, $value);
+        }
+    }
+
+    return $metadata ? $metadata : @values;
 }
 
-=item set_metadata($book_id, $metadata)
+=item set_metadata($id, $metadata)
 
 Set the metadata for a book.
 
 =cut
 
 sub set_metadata {
-    my ($self, $book_id, $metadata) = @_;
-    my $cache = $self->read_json('metadata', []);
-    my %out;
+    my ($self, $id, $metadata) = @_;
+    my $db = $self->{db};
 
-    $out{title} = $metadata->{title} if (defined($metadata->{title}));
-    $out{author} = join(', ', @{$metadata->{authors}})
-        if (defined($metadata->{authors}));
+    foreach my $field (@Ember::Metadata::FIELDS) {
+        my $value = $metadata->{$field};
+        my $key = "$id:$field";
 
-    if (defined($metadata->{series})) {
-        $out{series} = $metadata->{series};
-        $out{index} = $metadata->{series_index}
-            if (defined($metadata->{series_index}));
+        if (defined($value)) {
+            my $type = $Ember::Metadata::TYPES{$field};
+            my $ref = ref($value);
+
+            if ($type eq 'array') {
+                if ($ref eq 'ARRAY') {
+                    $value = join('\0', map {
+                        defined($_) ? $_ : ''
+                    } @{$value});
+                } else {
+                    undef($value);
+                }
+            } elsif ($type eq 'hash') {
+                if ($ref eq 'HASH') {
+                    $value = join('\0', map {
+                        defined($_) ? $_ : ''
+                    } %{$value});
+                } else {
+                    undef($value);
+                }
+            } elsif ($ref || ($value eq '')) {
+                undef($value);
+            }
+        }
+
+        if (defined($value)) {
+            $db->{$key} = $value;
+        } elsif (exists($db->{$key})) {
+            delete($db->{$key});
+        }
     }
-
-    $cache->[$book_id] = \%out;
-    $self->write_json('metadata', $cache);
 }
 
 =back
 
 =head1 SEE ALSO
 
-L<Ember::VFS>
+L<Ember::Metadata>
 
 =head1 AUTHOR
 

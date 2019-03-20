@@ -44,18 +44,15 @@ Create a new recent books viewer.
 
 sub new {
     my ($class, $args) = @_;
-    my (@ids, @books);
     my $config = $args->{config};
-    my $metadata = $config->get_metadata();
+    my @ids = $config->get_recent();
+    my @books;
 
-    foreach my $recent (@{$config->get_recent()}) {
-        my $id = $recent->[1];
-        my $meta = $metadata->[$id];
-        my $title = $meta->{title} || 'Unknown';
-        my $author = $meta->{author} || 'Unknown';
+    foreach my $id (@ids) {
+        my ($title, $authors) = $config->get_metadata($id, 'title', 'authors');
 
-        push(@ids, $id);
-        push(@books, "$title by $author");
+        push(@books, ($title || 'Unkown') . ' by '
+            . (@{$authors} ? join(' & ', @{$authors}) : 'Unknown'));
     }
 
     $args->{items} = \@books;
