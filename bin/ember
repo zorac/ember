@@ -40,6 +40,8 @@ eval {
         $class = get_class('Script', 'BackupConfig');
     } elsif ($args->{dump}) {
         $class = get_class('Script', 'Dump');
+    } elsif ($args->{import}) {
+        $class = get_class('Script', 'ImportLibrary');
     } elsif ($args->{help}) {
         $class = get_class('Script', 'Help');
     } elsif ($args->{version}) {
