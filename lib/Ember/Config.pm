@@ -213,9 +213,9 @@ sub get_metadata {
         my $value = $db->{"$id:$field"};
 
         if ($type eq 'array') {
-            $value = defined($value) ? [ split(/\0/, $value) ] : [];
+            $value = defined($value) ? [ split(/\n/, $value) ] : [];
         } elsif ($type eq 'hash') {
-            $value = defined($value) ? { split(/\0/, $value) } : {};
+            $value = defined($value) ? { split(/\n/, $value) } : {};
         } elsif (!defined($value)) {
             $value = '';
         }
@@ -250,7 +250,7 @@ sub set_metadata {
 
             if ($type eq 'array') {
                 if ($ref eq 'ARRAY') {
-                    $value = join('\0', map {
+                    $value = join("\n", map {
                         defined($_) ? $_ : ''
                     } @{$value});
                 } else {
@@ -258,7 +258,7 @@ sub set_metadata {
                 }
             } elsif ($type eq 'hash') {
                 if ($ref eq 'HASH') {
-                    $value = join('\0', map {
+                    $value = join("\n", map {
                         defined($_) ? $_ : ''
                     } %{$value});
                 } else {
