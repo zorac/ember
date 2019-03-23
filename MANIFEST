@@ -33,6 +33,7 @@ lib/Ember/Script/BackupConfig.pm
 lib/Ember/Script/Dump.pm
 lib/Ember/Script/Help.pm
 lib/Ember/Script/ImportLibrary.pm
+lib/Ember/Script/Search.pm
 lib/Ember/Script/Version.pm
 lib/Ember/Util.pm
 lib/Ember/VFS.pm

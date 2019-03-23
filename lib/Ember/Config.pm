@@ -275,6 +275,137 @@ sub set_metadata {
             delete($db->{$key});
         }
     }
+
+    $self->set_search_terms($id, $metadata->search_terms());
+}
+
+=item filter_terms(@terms)
+
+Filter an array of search terms, removing the unwanted and canonicalising the
+others
+
+=cut
+
+sub filter_terms {
+    my ($self, @terms) = @_;
+    my %terms = map {
+        uc($_) => 1 # TODO remove other characters
+    } grep {
+        length($_) > 1 # TODO what about non-latin scripts?
+    } @terms;
+
+    return sort(keys(%terms));
+}
+
+=item set_search_terms($id, @terms)
+
+Set the search terms for a book.
+
+=cut
+
+sub set_search_terms {
+    my ($self, $id, @terms) = @_;
+    my $db = $self->{db};
+    my $key = "$id:search";
+    my @new_terms;
+
+    @terms = $self->filter_terms(@terms);
+
+    my %old_terms = map {
+        $_ => 1
+    } split(',', $db->{$key}) if (exists($db->{$key}));
+
+    if (@terms) {
+        $db->{$key} = join(',',  @terms);
+    } else {
+        delete($db->{$key});
+    }
+
+    foreach my $term (@terms) {
+        if ($old_terms{$term}) {
+            delete($old_terms{$term});
+        } else {
+            push(@new_terms, $term);
+        }
+    }
+
+    foreach my $term (keys(%old_terms)) {
+        $key = "i:$term";
+
+        my %ids = map { $_ => 1 } split(',', $db->{$key});
+
+        delete($ids{$id});
+        $db->{$key} = join(',', keys(%ids));
+    }
+
+    foreach my $term (@new_terms) {
+        $key = "i:$term";
+
+        if (exists($db->{$key})) {
+            $db->{$key} .= ",$id";
+        } else {
+            $db->{$key} = $id;
+        }
+
+        my @subs = ($term);
+
+        while (my $sub = pop(@subs)) {
+            next if (length($sub) < 3);
+
+            my ($prefix, $body, $suffix) = ($sub =~ /^(.)(.+)(.)$/);
+
+            $key = "s:$prefix$body";
+
+            if (!exists($db->{$key})) {
+                $db->{$key} = $suffix;
+                push(@subs, "$prefix$body")
+            } elsif (index($db->{$key}, $suffix) < 0) {
+                $db->{$key} .= $suffix;
+            }
+
+            $key = "p:$body$suffix";
+
+            if (!exists($db->{$key})) {
+                $db->{$key} = $prefix;
+                push(@subs, "$body$suffix")
+            } elsif (index($db->{$key}, $prefix) < 0) {
+                $db->{$key} .= $prefix;
+            }
+        }
+    }
+}
+
+=item search(@terms)
+
+Search for books matching all of the given terms and return an array of IDs.
+
+=cut
+
+sub search {
+    my ($self, @terms) = @_;
+    my $db = $self->{db};
+    my %ids;
+
+    @terms = $self->filter_terms(@terms);
+    return if (!@terms);
+
+    # TODO multiple terms
+
+    while (my $term = pop(@terms)) {
+        map {
+            $ids{$_} = 1;
+        } split(/,/, $db->{"i:$term"}) if (exists($db->{"i:$term"}));
+
+        map {
+            push(@terms, $term . $_);
+        } split(//, $db->{"s:$term"}) if (exists($db->{"s:$term"}));
+
+        map {
+            push(@terms, $_ . $term);
+        } split(//, $db->{"p:$term"}) if (exists($db->{"p:$term"}));
+    }
+
+    return keys(%ids);
 }
 
 =back

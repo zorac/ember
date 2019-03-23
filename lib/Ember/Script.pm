@@ -35,6 +35,7 @@ our @FOR_ARG = (
     [ backup_config => 'BackupConfig'   ],
     [ dump          => 'Dump'           ],
     [ import        => 'ImportLibrary'  ],
+    [ search        => 'Search'         ],
 );
 
 =back

@@ -10,6 +10,7 @@
     * chapter - last chapter viewed
     * pos - reading position in the chapter
     * last - time of last access
+    * search - search terms
     * Any of the fields defined in `@Ember::Metadata::FIELDS`
 * i:{word} - IDs of books containing {word} in their metadata
 * s:{word} - Chracters which can be suffixed to {word} to make a longer word

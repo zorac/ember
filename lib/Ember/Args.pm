@@ -19,7 +19,7 @@ This class is the entrypoint for the Ember application.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( backup_config book debug dump help import version width );
+use fields qw( backup_config book debug dump help import search version width );
 
 use Getopt::Long;
 
@@ -50,6 +50,10 @@ If set, display help for Ember, then exit.
 =item import
 
 Path to an eBook library to import.
+
+=item search
+
+Search terms to find known eBooks.
 
 =item version
 
@@ -83,6 +87,7 @@ sub new {
         'dump|d=s',
         'help|h',
         'import|i=s',
+        'search|s=s',
         'version|v',
         'width|w=i',
     );

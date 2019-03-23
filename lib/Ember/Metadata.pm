@@ -215,6 +215,31 @@ sub display {
     return @meta;
 }
 
+=item search_terms()
+
+Fetch the search terms for this metadata.
+
+=cut
+
+sub search_terms {
+    my ($self) = @_;
+    my @terms;
+
+    if (defined($self->{authors})) {
+        foreach my $author (@{$self->{authors}}) {
+            push(@terms, split(/[^A-Za-z]+/, $author));
+        }
+    }
+
+    push(@terms, split(/[^A-Za-z]+/, $self->{title}))
+        if (defined($self->{title}));
+
+    push(@terms, split(/[^A-Za-z]+/, $self->{series}))
+        if (defined($self->{series}));
+
+    return @terms;
+}
+
 =back
 
 =head1 SEE ALSO
