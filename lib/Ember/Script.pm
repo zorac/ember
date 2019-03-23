@@ -19,6 +19,26 @@ use Carp;
 
 use Ember::Config;
 
+=head2 Constants
+
+=over
+
+=item @FOR_ARG
+
+Script to run based on the presence of an argument, in priority order.
+
+=cut
+
+our @FOR_ARG = (
+    [ help          => 'Help'           ],
+    [ version       => 'Version'        ],
+    [ backup_config => 'BackupConfig'   ],
+    [ dump          => 'Dump'           ],
+    [ import        => 'ImportLibrary'  ],
+);
+
+=back
+
 =head2 Fields
 
 =over

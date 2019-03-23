@@ -24,6 +24,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use Ember::Args;
+use Ember::Script;
 use Ember::Util;
 
 my $args = Ember::Args->new(@ARGV);
@@ -36,20 +37,13 @@ if ($args->{debug}) {
 }
 
 eval {
-    if ($args->{backup_config}) {
-        $class = get_class('Script', 'BackupConfig');
-    } elsif ($args->{dump}) {
-        $class = get_class('Script', 'Dump');
-    } elsif ($args->{import}) {
-        $class = get_class('Script', 'ImportLibrary');
-    } elsif ($args->{help}) {
-        $class = get_class('Script', 'Help');
-    } elsif ($args->{version}) {
-        $class = get_class('Script', 'Version');
-    } else {
-        $class = get_class();
+    foreach my $script (@Ember::Script::FOR_ARG) {
+        if ($args->{$script->[0]}) {
+            $class = get_class('Script', $script->[1]);
+        }
     }
 
+    $class = get_class() if (!$class);
     $app = $class->new($args);
     $app->run();
 }; if ($@) {
