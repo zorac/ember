@@ -10,6 +10,8 @@ lib/Ember/App/Metadata.pm
 lib/Ember/App/Pager.pm
 lib/Ember/App/Reader.pm
 lib/Ember/App/Recent.pm
+lib/Ember/App/SearchFilter.pm
+lib/Ember/App/SearchSelect.pm
 lib/Ember/App/Selector.pm
 lib/Ember/Args.pm
 lib/Ember/Book.pm

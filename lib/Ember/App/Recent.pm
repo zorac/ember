@@ -2,7 +2,7 @@ package Ember::App::Recent;
 
 =head1 NAME
 
-Ember::App::Recent - An app for displaying help for another app.
+Ember::App::Recent - An app for selecting a recently-viewed book.
 
 =head1 SYNOPSIS
 
@@ -12,7 +12,8 @@ my $app = Ember::App::Recent->new({ screen => $screen, recent => $recent });
 
 =head1 DESCRIPTION
 
-This class impements a metadata viewer for an eBook.
+This class displays a list of recently-viewed books anad allows the user to
+select one to read.
 
 =cut
 
@@ -70,6 +71,22 @@ sub new {
 
 =over
 
+=item keypress($key)
+
+Handle a keypress for switching to search mode.
+
+=cut
+
+sub keypress {
+    my ($self, $key) = @_;
+
+    if ($key eq 's') {
+        return 'push', 'SearchFilter';
+    } else {
+        return $self->SUPER::keypress($key);
+    }
+}
+
 =item help_text()
 
 Provides brief details of the recent books screen.
@@ -83,6 +100,23 @@ sub help_text {
 This screen displays your most recently read books.
 Type a book number and press enter to open that book.
 EOF
+}
+
+=item help_keys()
+
+Return help on the supported keypresses for the application.
+
+=cut
+
+sub help_keys {
+    my ($self) = @_;
+    my $keys = $self->SUPER::help_keys();
+
+    push(@{$keys},
+        [ S => 'Search for books' ],
+    );
+
+    return $keys;
 }
 
 =item selected($index)

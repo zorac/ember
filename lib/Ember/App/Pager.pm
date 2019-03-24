@@ -14,8 +14,7 @@ use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::App );
-use fields qw( pos lines line_pos line_count page page_size page_count
-        footer );
+use fields qw( pos lines line_pos line_count page page_size page_count);
 
 =head2 Fields
 
@@ -48,10 +47,6 @@ The current page size (number of visible lines).
 =item page_count
 
 The number of pages in the content.
-
-=item footer
-
-Persistent footer text, if any.
 
 =back
 
@@ -199,32 +194,15 @@ sub set_line_data {
 
 =item footer([ $text [, $persist ] ])
 
-Display the given text in the footer, or the default footer if empty/undefined.
-If the persist flag is set, the text should be kept until the persist flag is
-explicitly set off.
+Provides a default footer text displaying the current page.
 
 =cut
 
 sub footer() {
     my ($self, $text, $persist) = @_;
 
-    if ($persist) {
-        $self->{footer} = $text;
-    } elsif (defined($persist)) {
-        $self->{footer} = undef;
-    }
-
-    if (!defined($text)) {
-        if (defined($self->{footer})) {
-            $text = $self->{footer};
-        } else {
-            $text = '-- Page ' . $self->{page} . '/' . $self->{page_count};
-        }
-    }
-
-    $self->{screen}->move_to(0, $self->{height} - 1);
-    printf('%-' . $self->{width} . 's', $text);
-    STDOUT->flush();
+    $self->SUPER::footer($text, $persist,
+        '-- Page ' . $self->{page} . '/' . $self->{page_count});
 }
 
 =item page_prev()

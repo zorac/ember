@@ -14,7 +14,7 @@ screens within Ember, and accepts input via keypresses.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( config screen width height );
+use fields qw( config screen width height footer );
 
 use Carp;
 
@@ -37,6 +37,11 @@ The screen width, in characters.
 =item height
 
 The screen height, in characters.
+
+=item footer
+
+Persistent footer text, if any.
+
 
 =back
 
@@ -117,6 +122,36 @@ sub render {
     my ($self) = @_;
 
     croak(ref($self) . ' has not implemented render()');
+}
+
+=item footer([ $text [, $persist [, $default ] ] ])
+
+Display the given text in the footer, or the default footer if empty/undefined.
+If the persist flag is set, the text should be kept until the persist flag is
+explicitly set off. The default value should normally only be set by subclasses.
+
+=cut
+
+sub footer() {
+    my ($self, $text, $persist, $default) = @_;
+
+    if ($persist) {
+        $self->{footer} = $text;
+    } elsif (defined($persist)) {
+        $self->{footer} = undef;
+    }
+
+    if (!defined($text)) {
+        if (defined($self->{footer})) {
+            $text = $self->{footer};
+        } else {
+            $text = defined($default) ? $default : '--';
+        }
+    }
+
+    $self->{screen}->move_to(0, $self->{height} - 1);
+    printf('%-' . $self->{width} . 's', $text);
+    STDOUT->flush();
 }
 
 =item keypress($key)
