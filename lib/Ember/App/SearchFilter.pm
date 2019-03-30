@@ -16,7 +16,7 @@ use warnings;
 use base qw( Ember::App );
 use fields qw( terms ids metadata );
 
-use Ember::Format::KeyValue;
+use Ember::Format::Table;
 
 =head2 Fields
 
@@ -139,14 +139,12 @@ sub render {
     my $metadata = $self->{metadata};
     my $rows = $self->{height} - 1;
     my $count = $rows;
-    my $table = Ember::Format::KeyValue->new($self->{width});
+    my $table = Ember::Format::Table->new($self->{width});
 
     $count = @{$metadata} if ($count > @{$metadata});
 
     my @input = @{$metadata}[0 .. ($count - 1)];
     my @lines = $table->lines(\@input);
-
-    @lines = @lines[0 .. ($rows - 1)] if (@lines > $rows);
 
     $self->{screen}->clear_screen();
     print join("\n", @lines);

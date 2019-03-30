@@ -1,5 +1,11 @@
 Revision history for Ember
 
+0.11    30th March 2019
+        New config/cache file format
+        Library import functionality
+        Book search screens
+        Various fixes
+
 0.10    6th March 2019
         Tighter paragraph display format
 
