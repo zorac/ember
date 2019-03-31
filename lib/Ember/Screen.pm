@@ -19,7 +19,7 @@ Provides screen management for Ember apps.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( termcap );
+use fields qw( termcap debug );
 
 use Term::Cap;
 use Term::ReadKey;
@@ -38,6 +38,20 @@ our %KEYMAP = (
     27  => 'esc',
     127 => 'bs',
 );
+
+=back
+
+=head2 Fields
+
+=over
+
+=item termcap
+
+The Term::Cap object in use.
+
+=item debug
+
+Whether debug mode is enabled.
 
 =back
 
@@ -61,6 +75,7 @@ sub new {
     $self->{termcap}->Trequire(qw( cl cm ));
     # Don't enable full-screen mode if we're debugging as it zaps error messages
     $self->{termcap}->Tputs('ti', 1, *STDOUT) if (!$debug);
+    $self->{debug} = $debug ? 1 : 0;
 
     return $self;
 }
@@ -74,7 +89,7 @@ Restore the display to its original settings.
 sub DESTROY {
     my ($self) = @_;
 
-    $self->{termcap}->Tputs('te', 1, *STDOUT);
+    $self->{termcap}->Tputs('te', 1, *STDOUT) if (!$self->{debug});
     ReadMode('restore');
 }
 
