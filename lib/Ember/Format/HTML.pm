@@ -14,7 +14,7 @@ use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::Format::Document );
-use fields qw( spaced );
+use fields qw( spaced in_header in_list );
 
 use HTML::TreeBuilder 5 -weak;
 
@@ -33,7 +33,9 @@ our %BLOCK = (
     applet      => 1,
     blockquote  => 1,
     div         => 1,
+    dd          => 1,
     dl          => 1, # TODO handle lists
+    dt          => 1,
     fieldset    => 1,
     figure      => 1,
     embed       => 1,
@@ -45,6 +47,7 @@ our %BLOCK = (
     h5          => 1,
     h6          => 1,
     iframe      => 1,
+    li          => 1,
     noscript    => 1,
     object      => 1,
     ol          => 1, # TODO handle lists
@@ -78,6 +81,14 @@ our %HEADER = (
 =item spaced
 
 If set, output blank lines between paragraphs instead of indenting.
+
+=item in_header
+
+Indicates that we're in a header, to avoid double-underlining.
+
+=item in_header
+
+Indicates that we're in a list, to control spacing.
 
 =back
 
@@ -125,6 +136,9 @@ sub render {
     $tree->simplify_pres();
     $tree->number_lists();
 
+    $self->{in_header} = 0;
+    $self->{in_list} = 0;
+
     $self->render_element($tree);
 }
 
@@ -142,7 +156,8 @@ sub render_element {
     my $spaced = $self->{spaced} ? 2 : 0;
     my $tag = $element->tag();
     my $id = $element->id();
-    my ($hchar, $sline);
+    my $indent = 0;
+    my ($hchar, $sline, $is_list);
 
     if ($tag eq 'img') {
         my $text = $element->attr('alt'); # TODO or title?
@@ -167,7 +182,28 @@ sub render_element {
     } elsif ($hchar = $HEADER{$tag}) {
         $self->newline(2);
         $sline = @{$lines};
+        $self->{in_header} = 1;
     } elsif ($tag eq 'head') {
+        return;
+    } elsif ($tag eq 'li') {
+        my $bullet = $element->{_bullet} . ' ';
+
+        $self->newline(0);
+        $self->render_text($bullet);
+        $indent = length($bullet);
+    } elsif (($tag eq 'dl') || ($tag eq 'ol') || ($tag eq 'ul')) {
+        $self->newline($self->{in_list} ? 0 : 2);
+        $self->{in_list}++;
+        $is_list = 1;
+    } elsif ($tag eq 'dt') {
+        $self->newline(0);
+    } elsif ($tag eq 'dd') {
+        $self->newline(0);
+        $indent = 2;
+    } elsif ($tag eq 'pre') {
+        $self->newline(2);
+        $self->render_pre($element);
+        $self->newline(2);
         return;
     } elsif ($BLOCK{$tag}) {
         $self->newline($spaced);
@@ -176,13 +212,14 @@ sub render_element {
             my $last = $#{$lines};
 
             if (($last >= 0) && ($lines->[$last] ne '')) {
-                $self->{indent} = 2;
+                $self->{indent_once} = 2;
             }
         }
     } # TODO a, pre, blockquote, lists, etc
 
     $element->normalize_content();
     $self->add_anchor($id) if ($id);
+    $self->{indent} += $indent if ($indent);
 
     foreach my $child ($element->content_list()) {
         if (ref($child)) {
@@ -192,7 +229,9 @@ sub render_element {
         }
     }
 
-    if ($hchar) { # Underline a heading
+    $self->{indent} -= $indent if ($indent);
+
+    if ($hchar && $self->{in_header}) { # Underline a heading
         $self->newline();
 
         for (my $i = $#{$lines}; $i >= $sline; $i--) {
@@ -201,8 +240,40 @@ sub render_element {
         }
 
         $self->newline(1);
+        delete($self->{in_header});
+    } elsif ($is_list) {
+        $self->{in_list}--;
+        $self->newline($self->{in_list} ? 0 : 2);
     } elsif ($BLOCK{$tag}) {
         $self->newline($spaced);
+    }
+}
+
+=item render_pre($element)
+
+Render the given element in a preformatted text block.
+
+=cut
+
+sub render_pre {
+    my ($self, $element) = @_;
+
+    foreach my $child ($element->content_list()) {
+        if (ref($child)) {
+            my $tag = $child->tag();
+
+            if ($tag eq 'br') {
+                $self->newline(1);
+            } elsif ($BLOCK{$tag}) {
+                $self->newline(0);
+                $self->render_pre($child);
+                $self->newline(0);
+            } else {
+                $self->render_pre($child);
+            }
+        } else {
+            $self->render_raw_text($child);
+        }
     }
 }
 

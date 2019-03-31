@@ -1,18 +1,22 @@
 Revision history for Ember
 
+0.12    31st March 2019
+        Format HTML lists and pre.
+        Handle nested TOCs and sub-file links.
+
 0.11    30th March 2019
-        New config/cache file format
-        Library import functionality
-        Book search screens
-        Various fixes
+        New config/cache file format.
+        Library import functionality.
+        Book search screens.
+        Various fixes.
 
 0.10    6th March 2019
-        Tighter paragraph display format
+        Tighter paragraph display format.
 
 0.09    3rd March 2019
-        Add ability to dump books
-        Perfomance improvements
-        Internal enhancements
+        Add ability to dump books.
+        Perfomance improvements.
+        Internal enhancements.
 
 0.08    2nd March 2019
         Fixes and improvements to table-of-contents generation.

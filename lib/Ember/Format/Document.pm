@@ -14,7 +14,7 @@ use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::Format );
-use fields qw( lines line_pos anchors pos line llen space indent );
+use fields qw( lines line_pos anchors pos line llen space indent indent_once );
 
 =head2 Fields
 
@@ -50,7 +50,11 @@ The length of the current line of text during formatting.
 
 =item indent
 
-A number of spaces to indent the first line of the next paragraph.
+A number of spaces to indent each line.
+
+=item indent_once
+
+A number of spaces to indent the first line of the next paragraph..
 
 =back
 
@@ -80,6 +84,7 @@ sub data {
     $self->{llen} = 0;
     $self->{space} = 0;
     $self->{indent} = 0;
+    $self->{indent_once} = 0;
 
     $self->render($input); # Do the hard work!
 
@@ -109,6 +114,7 @@ sub data {
     undef($self->{llen});
     undef($self->{space});
     undef($self->{indent});
+    undef($self->{indent_once});
 
     # And we're done
     return $result;
@@ -142,17 +148,15 @@ sub render_text {
     my $pos = $self->{pos};
     my $line = $self->{line};
     my $llen = $self->{llen};
+    my $indent = $self->{indent};
+    my $indent_once = $self->{indent_once};
     my $space = ($llen > 0) ? $self->{space} : 1;
     # We want to know if there's leading or trailing space, so we split thusly:
     my @words = split(/\s+/, $text, -1);
 
-    if ($self->{indent}) {
-        if (($llen == 0) && @words) {
-            $llen = $self->{indent};
-            $line = ' ' x $llen;
-        }
-
-        $self->{indent} = 0;
+    if ($indent_once) {
+        $indent_once = 0 if ($llen > 0);
+        $self->{indent_once} = 0;
     }
 
     foreach my $word (@words) {
@@ -202,8 +206,17 @@ sub render_text {
         }
 
         if ($llen == 0) {
-            $line = $word;
-            $llen = $wlen;
+            if ($indent || $indent_once) {
+                my $i = $indent + $indent_once;
+
+                $indent_once = 0;
+                $i = ($width - $wlen) if (($i + $wlen) > $width);
+                $line = (' ' x $i) . $word;
+                $llen = $i + $wlen;
+            } else {
+                $line = $word;
+                $llen = $wlen;
+            }
         } else {
             $line .= ' ' if ($space);
             $line .= $word;
@@ -215,6 +228,53 @@ sub render_text {
     $self->{line} = $line;
     $self->{llen} = $llen;
     $self->{space} = (@words && ($words[$#words] eq '')) ? 1 : 0;
+}
+
+=item render_raw_text($text)
+
+Render some raw text. Whitespace will not be collapsed, and newlines will be
+homored.
+
+=cut
+
+sub render_raw_text {
+    my ($self, $text) = @_;
+    my $width = $self->{width};
+    my $lines = $self->{lines};
+    my $line_pos = $self->{line_pos};
+    my $pos = $self->{pos};
+    my $line = $self->{line};
+    my $llen = $self->{llen};
+    my $last = ' ';
+
+    foreach my $char (split(//, $text)) {
+        my $newline = 0;
+
+        if ($char eq "\r") {
+            $newline = 1;
+        } elsif ($char eq "\n") {
+            $newline = ($last ne "\r");
+        } else {
+            $pos++ if (($last =~ /^\s$/) && ($char =~ /^\S$/));
+            $line .= $char;
+            $llen++;
+            $newline = 1 if ($llen >= $width);
+        }
+
+        $last = $char;
+
+        if ($newline) {
+            push(@{$lines}, $line);
+            push(@{$line_pos}, $pos);
+            $line = '';
+            $llen = 0;
+        }
+    }
+
+    $self->{pos} = $pos;
+    $self->{line} = $line;
+    $self->{llen} = $llen;
+    $self->{space} = 0;
 }
 
 =item newline($extra)
@@ -248,7 +308,7 @@ sub newline {
         }
     }
 
-    $self->{indent} = 0;
+    $self->{indent_once} = 0;
 }
 
 =item add_line($line [, $before [, $after]])
