@@ -97,6 +97,8 @@ sub new {
         push(@chapters, $chapter);
     }
 
+    # TODO <guide>
+
     $self->{metadata} = Ember::Metadata::OPF->new($opf);
     $self->{toc} = $toc;
     $self->{manifest} = \%manifest;

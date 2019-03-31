@@ -28,29 +28,30 @@ Mapping from OPF metadata fields to our internal ones.
 =cut
 
 our %MAP = (
-    'calibre:series'        => { field  => 'series' },
-    'calibre:series_index'  => { field  => 'series_index' },
-    'calibre:title_sort'    => { field  => 'title_sort' },
-    'dc:creator'            => { field  => 'authors',
-                                 extra  => { 'opf:file-as' => 'ember:author_sort' } },
-    'dc:date'               => { field  => 'date',
-                                 format => 'extract_date' },
-    'dc:description'        => { field  => 'description',
-                                 format => 'html2text' },
-    'dc:identifier'         => { field  => 'ids',
-                                 key    => 'id' },
-    'dc:language'           => { field  => 'language' },
-    'dc:publisher'          => { field  => 'publisher' },
-    'dc:rights'             => { field  => 'copyright' },
-    'dc:title'              => { field  => 'title' },
-    'ember:author_sort'     => { field  => 'author_sort',
-                                 join   => ' & ' },
-    'generator'             => { field  => 'generator' },
+    'author_sort'   => { field  => 'author_sort',
+                         join   => ' & ' },
+    'creator'       => { field  => 'authors',
+                         extra  => { 'opf:file-as' => 'ember:author_sort' } },
+    'date'          => { field  => 'date',
+                         format => 'extract_date' },
+    'description'   => { field  => 'description',
+                         format => 'html2text' },
+    'identifier'    => { field  => 'ids',
+                         key    => 'id' },
+    'language'      => { field  => 'language' },
+    'publisher'     => { field  => 'publisher' },
+    'rights'        => { field  => 'copyright' },
+    'series'        => { field  => 'series' },
+    'series_index'  => { field  => 'series_index' },
+    'title'         => { field  => 'title' },
+    'title_sort'    => { field  => 'title_sort' },
+    'generator'     => { field  => 'generator' },
     # dc:contributor?
+    # dc:coverage?
     # dc:relation?
+    # dc:rightsHolder?
     # dc:subject?
     # dc:source?
-    # dc:coverage?
 );
 
 =head2 Class Methods
@@ -74,7 +75,11 @@ sub new {
 
         foreach my $value (@{$values}) {
             if ($key eq 'meta') {
-                $self->add_metadata($value->{name}, 'content', $value);
+                if (defined($value->{property})) {
+                    $self->add_metadata($value->{property}, '_', $value);
+                } else {
+                    $self->add_metadata($value->{name}, 'content', $value);
+                }
             } else {
                 $self->add_metadata($key, '_', $value);
             }
@@ -100,6 +105,9 @@ Add an item of metadata.
 
 sub add_metadata {
     my ($self, $key, $content_key, $value) = @_;
+
+    $key = $1 if ($key =~ /^\S+:(.*)$/);
+
     my $meta = $MAP{$key};
 
     return if (!$meta);
@@ -119,12 +127,21 @@ sub add_metadata {
 
     if ($type eq 'array') {
         $self->{$field} = [] if (!$self->{$field});
-        push(@{$self->{$field}}, $text);
+
+        foreach my $t (@{$self->{$field}}) {
+            if ($t eq $text) {
+                undef($text);
+                last;
+            }
+        }
+
+        push(@{$self->{$field}}, $text) if (defined($text));
     } elsif ($type eq 'hash') {
         $self->{$field} = {} if (!$self->{$field});
         $self->{$field}{$value->{$meta->{key}}} = $text;
     } elsif (defined($meta->{join}) && defined($self->{$field})) {
-        $self->{$field} .= $meta->{join} . $text;
+        $self->{$field} .= $meta->{join} . $text
+            if (index($self->{$field}, $text) < 0); # TODO be less crude
     } else {
         $self->{$field} = $text;
     }
