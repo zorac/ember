@@ -38,6 +38,10 @@ lib/Ember/Script/Help.pm
 lib/Ember/Script/ImportLibrary.pm
 lib/Ember/Script/Search.pm
 lib/Ember/Script/Version.pm
+lib/Ember/TOC.pm
+lib/Ember/TOC/Entry.pm
+lib/Ember/TOC/NCX.pm
+lib/Ember/TOC/Spine.pm
 lib/Ember/Util.pm
 lib/Ember/VFS.pm
 lib/Ember/VFS/Dir.pm

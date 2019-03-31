@@ -18,6 +18,8 @@ use fields qw( manifest rootpath );
 
 use Ember::EPUB::Chapter;
 use Ember::Metadata::OPF;
+use Ember::TOC::NCX;
+use Ember::TOC::Spine;
 
 =head2 Fields
 
@@ -56,7 +58,8 @@ sub new {
     my $opf_file = $container->{rootfiles}[0]{rootfile}[0]{'full-path'};
     my ($root_path) = ($opf_file =~ /^(.*?)[^\/]*$/);
     my $opf = $vfs->read_xml($opf_file);
-    my (%manifest, %titles, @chapters, $prev);
+    my $spine = $opf->{spine}[0];
+    my (%manifest, $toc, @chapters, $prev);
 
     foreach my $item (@{$opf->{manifest}[0]{item}}) {
         my $id = $item->{id};
@@ -72,23 +75,17 @@ sub new {
         my $ncx_file = $root_path . $manifest{$opf->{spine}[0]{toc}}{file};
         my $ncx = $vfs->read_xml($ncx_file);
 
-        foreach my $nav (@{$ncx->{navMap}[0]{navPoint}}) {
-            my $src = $nav->{content}[0]{src};
-            my $pos = index($src, '#');
-
-            $src = substr($src, 0, $pos) if ($pos > 0);
-
-            $titles{$src} = $nav->{navLabel}[0]{text}[0]{_};
-        }
+        $toc = Ember::TOC::NCX->new($ncx);
+    } else {
+        $toc = Ember::TOC::Spine->new($spine);
     }
 
-    foreach my $ref (@{$opf->{spine}[0]{itemref}}) {
+    foreach my $ref (@{$spine->{itemref}}) {
         my $id = $ref->{idref};
         my $item = $manifest{$id};
         my $skip = $ref->{linear} && ($ref->{linear} eq 'no');
         my $chapter = Ember::EPUB::Chapter->new({
             id => $id,
-            title => $titles{$item->{file}},
             path => $item->{file},
             mime => $item->{mime},
             skip => $skip,
@@ -101,6 +98,7 @@ sub new {
     }
 
     $self->{metadata} = Ember::Metadata::OPF->new($opf);
+    $self->{toc} = $toc;
     $self->{manifest} = \%manifest;
     $self->{chapters} = \@chapters;
     $self->{rootpath} = $root_path;

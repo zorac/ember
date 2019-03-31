@@ -20,7 +20,7 @@ retrieving their chapters and other details.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( id filename vfs config metadata chapters is_new );
+use fields qw( id filename vfs config metadata toc chapters is_new );
 
 use Carp;
 use Cwd qw( realpath );
@@ -68,6 +68,10 @@ An L<Ember::Config> instance.
 =item metadata
 
 An L<Ember::Metadata> with details of this book.
+
+=item toc
+
+An L<Ember::TOC> with the table of contents of this book.
 
 =item chapters
 
@@ -135,7 +139,7 @@ sub open {
     my $book = $class->new({ vfs => $vfs, config => $config });
 
     $book->load_external_metadata();
-    $book->save_metadata() if ($book->{is_new});
+    $book->save_metadata() if ($book->{is_new}); # TODO always?
 
     return $book;
 
@@ -220,7 +224,7 @@ sub load_external_metadata {
         my $class = get_class('Metadata', 'OPF');
         my $metadata = $class->new($opf);
 
-        $self->{metadata} = $metadata;
+        $self->{metadata} = $metadata; # TODO merge
     }
 }
 
