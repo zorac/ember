@@ -56,34 +56,33 @@ sub new {
     my $opf_file = $container->{rootfiles}[0]{rootfile}[0]{'full-path'};
     my ($root_path) = ($opf_file =~ /^(.*?)[^\/]*$/);
     my $opf = $vfs->read_xml($opf_file);
-    my %items = %{$opf->{manifest}[0]{item}};
-    my @refs = @{$opf->{spine}[0]{itemref}};
     my (%manifest, %titles, @chapters, $prev);
 
-    foreach my $id (keys(%items)) {
+    foreach my $item (@{$opf->{manifest}[0]{item}}) {
+        my $id = $item->{id};
+
         $manifest{$id} = {
             id      => $id,
-            file    => $items{$id}{href},
-            mime    => $items{$id}{'media-type'},
+            file    => $item->{href},
+            mime    => $item->{'media-type'},
         };
     }
 
     if ($opf->{spine}[0]{toc}) {
         my $ncx_file = $root_path . $manifest{$opf->{spine}[0]{toc}}{file};
         my $ncx = $vfs->read_xml($ncx_file);
-        my $navs = $ncx->{navMap}[0]{navPoint};
 
-        foreach my $nav (values(%{$navs})) {
-            my $src = $nav->{content}{src};
+        foreach my $nav (@{$ncx->{navMap}[0]{navPoint}}) {
+            my $src = $nav->{content}[0]{src};
             my $pos = index($src, '#');
 
             $src = substr($src, 0, $pos) if ($pos > 0);
 
-            $titles{$src} = $nav->{navLabel}[0]{text}[0];
+            $titles{$src} = $nav->{navLabel}[0]{text}[0]{_};
         }
     }
 
-    foreach my $ref (@refs) {
+    foreach my $ref (@{$opf->{spine}[0]{itemref}}) {
         my $id = $ref->{idref};
         my $item = $manifest{$id};
         my $skip = $ref->{linear} && ($ref->{linear} eq 'no');

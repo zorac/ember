@@ -17,6 +17,42 @@ use base qw( Ember::Metadata );
 
 use Ember::Format::HTML;
 
+=head2 Constants
+
+=over
+
+=item %MAP
+
+Mapping from OPF metadata fields to our internal ones.
+
+=cut
+
+our %MAP = (
+    'calibre:series'        => { field  => 'series' },
+    'calibre:series_index'  => { field  => 'series_index' },
+    'calibre:title_sort'    => { field  => 'title_sort' },
+    'dc:creator'            => { field  => 'authors',
+                                 extra  => { 'opf:file-as' => 'ember:author_sort' } },
+    'dc:date'               => { field  => 'date',
+                                 format => 'extract_date' },
+    'dc:description'        => { field  => 'description',
+                                 format => 'html2text' },
+    'dc:identifier'         => { field  => 'ids',
+                                 key    => 'id' },
+    'dc:language'           => { field  => 'language' },
+    'dc:publisher'          => { field  => 'publisher' },
+    'dc:rights'             => { field  => 'copyright' },
+    'dc:title'              => { field  => 'title' },
+    'ember:author_sort'     => { field  => 'author_sort',
+                                 join   => ' & ' },
+    'generator'             => { field  => 'generator' },
+    # dc:contributor?
+    # dc:relation?
+    # dc:subject?
+    # dc:source?
+    # dc:coverage?
+);
+
 =head2 Class Methods
 
 =over
@@ -30,114 +66,102 @@ Create a new OPF metadata object, given a hashref of parsed OPF XML.
 sub new {
     my ($class, $opf) = @_;
     my $self = $class->SUPER::new();
-    my $format = Ember::Format::HTML->new(999999, 1); # We just want text
-    my %metadata;
 
-    $self->parse(\%metadata, $opf->{metadata}[0]{meta});
-    $self->parse(\%metadata, $opf->{metadata}[0]);
+    foreach my $key (keys(%{$opf->{metadata}[0]})) {
+        my $values = $opf->{metadata}[0]{$key};
 
-    $self->{title} = $metadata{title}[0]{content}
-        if ($metadata{title});
-    $self->{title_sort} = $metadata{title_sort}[0]{content}
-        if ($metadata{title_sort});
-    $self->{series} = $metadata{series}[0]{content}
-        if ($metadata{series});
-    $self->{series_index} = 0 + $metadata{series_index}[0]{content}
-        if ($metadata{series_index});
-    $self->{publisher} = $metadata{publisher}[0]{content}
-        if ($metadata{publisher});
-    $self->{generator} = $metadata{generator}[0]{content}
-        if ($metadata{generator});
-    $self->{language} = $metadata{language}[0]{content}
-        if ($metadata{language});
-    $self->{copyright} = $metadata{rights}[0]{content}
-        if ($metadata{rights});
+        next if (ref($values) ne 'ARRAY');
 
-    if ($metadata{creator}) {
-        $self->{authors} = [ map { $_->{content} } @{$metadata{creator}} ];
-        $self->{author_sort} = $metadata{creator}[0]{'file-as'}
-            if ($metadata{creator}[0]{'file-as'});
+        foreach my $value (@{$values}) {
+            if ($key eq 'meta') {
+                $self->add_metadata($value->{name}, 'content', $value);
+            } else {
+                $self->add_metadata($key, '_', $value);
+            }
+        }
     }
 
-    if ($metadata{date} && ($metadata{date}[0]{content} =~ /^([^T]+)/)) {
-        $self->{date} = $1 unless ($1 eq '0101-01-01');
+    if (!defined($self->{title_sort}) && defined($self->{title})) {
+        $self->{title_sort} = $self->{title}; # TODO sortify
     }
 
-    if ($metadata{description}) {
-        my @lines = $format->lines($metadata{description}[0]{content});
-
-        $self->{description} = join("\n", @lines);
+    if (!defined($self->{author_sort}) && defined($self->{authors})) {
+        $self->{title_sort} = join(' & ', @{$self->{authors}}); # TODO sortify
     }
-
-    if ($metadata{identifier}) {
-        $self->{ids} = { map {
-            ($_->{scheme} || $_->{id} || 'id') => $_->{content}
-        } @{$metadata{identifier}} };
-    }
-
-    # use Data::Dumper; $Data::Dumper::Indent = 1; die Dumper($self);
-    # TODO parse more metadata, TOC, etc
-    # dc:identifier (multi,opf:scheme)
-    # dc:relation?
-    # dc:subject?
-    # dc:source?
-    # dc:coverage?
 
     return $self;
 }
 
-=back
+=item add_metadata($key, $content_key, $value)
 
-=head2 Instance Methods
-
-=over
-
-=item parse($out, $in)
-
-Extract metadata from parsed XML.
+Add an item of metadata.
 
 =cut
 
-sub parse {
-    my ($self, $out, $in) = @_;
-    my $ref = ref($in);
+sub add_metadata {
+    my ($self, $key, $content_key, $value) = @_;
+    my $meta = $MAP{$key};
 
-    if ($ref eq 'ARRAY') {
-        $in = { map {
-            ($_->{name} || $_->{property}) => $_
-        } @{$in} };
-    } elsif ($ref ne 'HASH') {
-        return;
+    return if (!$meta);
+
+    my $field = $meta->{field};
+    my $type = $Ember::Metadata::TYPES{$field};
+    my $text = $value->{$content_key};
+
+    return if (!defined($text));
+
+    if ($meta->{format}) {
+        my $method = $meta->{format};
+
+        $text = $self->$method($text);
+        return if (!defined($text));
     }
 
-    foreach my $key (keys(%{$in})) {
-        my $value = $in->{$key};
-        my $ref = ref($value);
+    if ($type eq 'array') {
+        $self->{$field} = [] if (!$self->{$field});
+        push(@{$self->{$field}}, $text);
+    } elsif ($type eq 'hash') {
+        $self->{$field} = {} if (!$self->{$field});
+        $self->{$field}{$value->{$meta->{key}}} = $text;
+    } elsif (defined($meta->{join}) && defined($self->{$field})) {
+        $self->{$field} .= $meta->{join} . $text;
+    } else {
+        $self->{$field} = $text;
+    }
 
-        next if (($ref eq 'HASH') && !%{$value});
-        $key =~ /^([^:]+)(?::([^:]+))?/;
-        next if (($1 eq 'meta') || ($1 eq 'xmlns')
-            || ($2 && ($2 eq 'user_metadata')));
-        $key = $2 ? $2 : $1;
-
-        my @values = ($ref eq 'ARRAY') ? @{$value} : ($value);
-
-        for (my $i = 0; $i < @values; $i++) {
-            if (ref($values[$i]) eq 'HASH') {
-                foreach my $subkey (keys(%{$values[$i]})) {
-                    if ($subkey =~ /^(.+):(.+)$/) {
-                        $values[$i]{$2} = $values[$i]{$subkey}
-                            if ($1 ne 'xmlns');
-                        delete($values[$i]{$subkey});
-                    }
-                }
-            } else {
-                $values[$i] = { content => $values[$i] };
-            }
+    if ($meta->{extra}) {
+        foreach my $ekey (keys(%{$meta->{extra}})) {
+            $self->add_metadata($meta->{extra}{$ekey}, $ekey, $value);
         }
-
-        $out->{$key} = \@values;
     }
+}
+
+=item html2text($html)
+
+Convert HTML metadata to plain text.
+
+=cut
+
+sub html2text {
+    my ($self, $html) = @_;
+    my $format = Ember::Format::HTML->new(999999, 1); # We just want text
+
+    return join("\n", $format->lines($html));
+}
+
+=item extract_date($date)
+
+Extract the date from a date/time field.
+
+=cut
+
+sub extract_date {
+    my ($self, $date) = @_;
+
+    $date = $1 if ($date =~ /^(\d\d\d\d-\d\d-\d\d)/);
+    undef($date) if ($date eq '0101-01-01'); # Calibre bug
+
+    return $date;
 }
 
 =back

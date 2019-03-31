@@ -23,7 +23,7 @@ use fields qw( filename json xml );
 
 use Carp;
 use JSON;
-use XML::Simple;
+use XML::Simple qw( :strict );
 
 use Ember::Util;
 
@@ -197,7 +197,10 @@ sub _xml {
 
     if (!$xml) {
         $xml = XML::Simple->new(
+            ContentKey => '_',
             ForceArray => 1,
+            ForceContent => 1,
+            KeyAttr => [],
             NormaliseSpace => 2,
         );
 
