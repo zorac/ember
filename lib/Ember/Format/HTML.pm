@@ -140,9 +140,9 @@ sub render_element {
     my $lines = $self->{lines};
     my $line_pos = $self->{line_pos};
     my $spaced = $self->{spaced} ? 2 : 0;
-    my ($hchar, $sline);
-
     my $tag = $element->tag();
+    my $id = $element->id();
+    my ($hchar, $sline);
 
     if ($tag eq 'img') {
         my $text = $element->attr('alt'); # TODO or title?
@@ -182,6 +182,7 @@ sub render_element {
     } # TODO a, pre, blockquote, lists, etc
 
     $element->normalize_content();
+    $self->add_anchor($id) if ($id);
 
     foreach my $child ($element->content_list()) {
         if (ref($child)) {

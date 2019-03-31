@@ -13,7 +13,7 @@ This class represents an entry in a Table of Contents.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( id chapter anchor title order );
+use fields qw( id chapter anchor title order depth children );
 
 =head2 Fields
 
@@ -38,6 +38,14 @@ The entry's title.
 =item order
 
 Display order for the entry.
+
+=item depth
+
+The depth of this entry, where 0/undef is a root entry.
+
+=item children
+
+The child entries of this entry.
 
 =back
 

@@ -50,6 +50,36 @@ sub new {
 
 =over
 
+=item root_entries()
+
+Return an array of root entries.
+
+=cut
+
+sub root_entries {
+    my ($self) = @_;
+
+    return @{$self->{entries}};
+}
+
+=item all_entries()
+
+Return an array of all entries.
+
+=cut
+
+sub all_entries {
+    my ($self) = @_;
+    my @entries = @{$self->{entries}};
+
+    for (my $i = 0; $i < @entries; $i++) {
+        splice(@entries, $i + 1, 0, @{$entries[$i]{children}})
+            if (defined($entries[$i]{children}));
+    }
+
+    return @entries;
+}
+
 =back
 
 =head1 SEE ALSO

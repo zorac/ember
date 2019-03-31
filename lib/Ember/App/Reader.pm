@@ -20,7 +20,7 @@ use 5.008;
 use strict;
 use warnings;
 use base qw( Ember::App::Pager );
-use fields qw( book chapter );
+use fields qw( book chapter anchor );
 
 =head2 Fields
 
@@ -33,6 +33,10 @@ The book being read.
 =item chapter
 
 The chapter currently being read.
+
+=item anchor
+
+An anchor to be jumped to.
 
 =back
 
@@ -74,7 +78,16 @@ Layout the current chapter for the current screen size.
 sub layout {
     my ($self, $changed) = @_;
 
-    $self->set_line_data($self->{chapter}->data($self->{width})) if ($changed);
+    if ($changed) {
+        my $data = $self->{chapter}->data($self->{width});
+
+        if ($self->{anchor}) {
+            $self->{pos} = $data->{anchors}{$self->{anchor}} || 0;
+            delete($self->{anchor});
+        }
+
+        $self->set_line_data($data);
+    }
 
     $self->SUPER::layout();
 }
@@ -142,11 +155,13 @@ sub command {
     my ($self, $command, @args) = @_;
 
     if ($command eq 'chapter') {
-        my $chapter = $self->{book}->chapter(shift(@args));
+        my ($id, $anchor) = @args;
+        my $chapter = $self->{book}->chapter($id);
 
         if (defined($chapter)) {
             $self->{chapter} = $chapter;
             $self->{pos} = 0;
+            $self->{anchor} = $anchor;
             $self->layout(1); # TODO mark as dirty instead?
         }
     }

@@ -29,22 +29,47 @@ Create a new table of contents from parsed NCX XML.
 
 sub new {
     my ($class, $ncx) = @_;
+    my $self = $class->SUPER::new();
+
+    $self->{entries} = $self->read_navs($ncx->{navMap}[0], 0) || [];
+
+    return $self;
+}
+
+=back
+
+=head2 Instance Methods
+
+=over
+
+=item read_navs($nav_map, $depth)
+
+Read navItems from the input and return an arrayref of entries, or undef if
+none found.
+
+=cut
+
+sub read_navs {
+    my ($self, $nav_map, $depth) = @_;
     my @entries;
 
-    foreach my $nav (@{$ncx->{navMap}[0]{navPoint}}) {
+    return undef if (!$nav_map->{navPoint});
+
+    foreach my $nav (@{$nav_map->{navPoint}}) {
         my ($chapter, $anchor) = split(/#/, $nav->{content}[0]{src});
 
         push(@entries, Ember::TOC::Entry->new({
-            id      => $nav->{id},
-            chapter => $chapter,
-            anchor  => $anchor,
-            title   => $nav->{navLabel}[0]{text}[0]{_},
-            order   => $nav->{playOrder},
+            id          => $nav->{id},
+            chapter     => $chapter,
+            anchor      => $anchor,
+            title       => $nav->{navLabel}[0]{text}[0]{_},
+            order       => $nav->{playOrder},
+            depth       => $depth,
+            children    => $self->read_navs($nav, $depth + 1),
         }));
-        # TODO nested
     }
 
-    return $class->SUPER::new(\@entries);
+    return \@entries;
 }
 
 =back

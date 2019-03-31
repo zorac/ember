@@ -272,6 +272,18 @@ sub add_line {
 
 =back
 
+=item add_anchor($id)
+
+Add an anchor with the given ID at the current line.
+
+=cut
+
+sub add_anchor {
+    my ($self, $id) = @_;
+
+    $self->{anchors}{$id} = $self->{pos};
+}
+
 =head1 SEE ALSO
 
 L<Ember::Format>

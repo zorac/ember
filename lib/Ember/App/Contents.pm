@@ -47,9 +47,13 @@ sub new {
     my $toc = $args->{book}{toc};
     my (@ids, @titles);
 
-    foreach my $entry (@{$toc->{entries}}) {
-        push(@ids, $entry->{chapter});
-        push(@titles, $entry->{title});
+    foreach my $entry ($toc->all_entries()) {
+        my $title = $entry->{title};
+
+        $title = (('..' x int($entry->{depth})) . $title) if ($entry->{depth});
+
+        push(@ids, [ $entry->{chapter}, $entry->{anchor} ]);
+        push(@titles, $title);
     }
 
     $args->{items} = \@titles;
@@ -91,7 +95,7 @@ Called when the user selects a chapter.
 sub selected {
     my ($self, $index) = @_;
 
-    return 'pop', 'chapter', $self->{ids}[$index];
+    return 'pop', 'chapter', @{$self->{ids}[$index]};
 }
 
 =back
