@@ -27,9 +27,9 @@ use fields qw( path );
 use Carp;
 use Cwd qw( realpath );
 use File::Spec;
-use XML::Simple;
 
 use Ember::Metadata::OPF;
+use Ember::Util;
 
 =head2 Fields
 
@@ -99,10 +99,6 @@ sub import_calibre {
     my ($self) = @_;
     my $config = $self->{config};
     my $path = $self->{path};
-    my $xml = XML::Simple->new(
-        ForceArray => 1,
-        NormaliseSpace => 2,
-    );
 
     opendir(my $calibre_dir, $path);
 
@@ -139,7 +135,7 @@ sub import_calibre {
                 print "Adding $book_file...\n";
 
                 my $id = $config->get_id($book_file);
-                my $opf = $xml->parse_file($metadata_file);
+                my $opf = xml_decode_file($metadata_file);
                 my $metadata = Ember::Metadata::OPF->new($opf);
 
                 $config->set_metadata($id, $metadata);

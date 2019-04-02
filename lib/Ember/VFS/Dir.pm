@@ -58,7 +58,7 @@ sub read_text {
     $path = File::Spec->join($self->{filename}, $path);
 
     return unless (-f $path);
-    return read_file($path, { binmode => ':utf8' });
+    return scalar(read_file($path, { binmode => ':utf8' }));
 }
 
 =item write_text($path, $content)

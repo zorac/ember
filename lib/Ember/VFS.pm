@@ -19,11 +19,9 @@ Abstract superclass for objects which provide a virtual filesystem to Ember.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( filename json xml );
+use fields qw( filename );
 
 use Carp;
-use JSON;
-use XML::Simple qw( :strict );
 
 use Ember::Util;
 
@@ -51,14 +49,6 @@ our %HINTS = (
 =item filename
 
 The base file or directory name.
-
-=item json
-
-A JSON encoder/decoder.
-
-=item xml
-
-An XML encoder/decoder.
 
 =back
 
@@ -140,24 +130,6 @@ sub write_text {
     croak(ref($self) . ' has not implemented write_text()');
 }
 
-=item _json()
-
-Fetch or create a JSON encoder/decoder.
-
-=cut
-
-sub _json {
-    my ($self) = @_;
-    my $json = $self->{json};
-
-    if (!$json) {
-        $json = JSON->new()->utf8()->indent()->space_after();
-        $self->{json} = $json;
-    }
-
-    return $json;
-}
-
 =item read_json($path)
 
 Read the file at a given path, parse it as JSON, and return the parsed content.
@@ -167,10 +139,8 @@ Returns undefined if the file does not exist.
 
 sub read_json {
     my ($self, $path) = @_;
-    my $json = $self->read_text($path);
 
-    return unless (defined($json) && ($json ne ''));
-    return $self->_json()->decode($json); # TODO error handling
+    return json_decode($self->read_text($path));
 }
 
 =item write_json($path, $content)
@@ -182,32 +152,7 @@ Encode the given content as JSON and write it to a file at the given path.
 sub write_json {
     my ($self, $path, $content) = @_;
 
-    $self->write_text($path, $self->_json()->encode($content));
-}
-
-=item _xml()
-
-Fetch or create an XML encoder/decoder.
-
-=cut
-
-sub _xml {
-    my ($self) = @_;
-    my $xml = $self->{xml};
-
-    if (!$xml) {
-        $xml = XML::Simple->new(
-            ContentKey => '_',
-            ForceArray => 1,
-            ForceContent => 1,
-            KeyAttr => [],
-            NormaliseSpace => 2,
-        );
-
-        $self->{xml} = $xml;
-    }
-
-    return $xml;
+    $self->write_text($path, json_encode($content));
 }
 
 =item read_xml($path)
@@ -219,10 +164,8 @@ Returns undefined if the file does not exist.
 
 sub read_xml {
     my ($self, $path) = @_;
-    my $xml = $self->read_text($path);
 
-    return unless (defined($xml) && ($xml ne ''));
-    return $self->_xml()->parse_string($xml); # TODO error handling
+    return xml_decode($self->read_text($path));
 }
 
 =item write_xml($path, $content)
@@ -234,7 +177,7 @@ Encode the given content as XML and write it to a file at the given path.
 sub write_xml {
     my ($self, $path, $content) = @_;
 
-    $self->write_text($path, $self->_xml()->encode($content));
+    $self->write_text($path, xml_encode($content));
 }
 
 =back

@@ -23,7 +23,7 @@ use strict;
 use warnings;
 use base qw( Ember::Script );
 
-use JSON;
+use Ember::Util;
 
 =head2 Instance Methods
 
@@ -37,9 +37,8 @@ Back up the config.
 
 sub run {
     my ($self) = @_;
-    my $json = JSON->new()->utf8()->indent()->space_after();
 
-    print $json->encode($self->{config}->{db});
+    print json_encode($self->{config}->{db});
 }
 
 =back
