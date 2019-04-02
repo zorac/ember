@@ -31,13 +31,13 @@ our %MAP = (
     'author_sort'   => { field  => 'author_sort',
                          join   => ' & ' },
     'creator'       => { field  => 'authors',
-                         extra  => { 'opf:file-as' => 'ember:author_sort' } },
+                         extra  => { 'file-as' => 'author_sort' } },
     'date'          => { field  => 'date',
                          format => 'extract_date' },
     'description'   => { field  => 'description',
                          format => 'html2text' },
     'identifier'    => { field  => 'ids',
-                         key    => 'id' },
+                         keys   => [ 'id', 'scheme' ] },
     'language'      => { field  => 'language' },
     'publisher'     => { field  => 'publisher' },
     'rights'        => { field  => 'copyright' },
@@ -105,6 +105,7 @@ Add an item of metadata.
 
 sub add_metadata {
     my ($self, $key, $content_key, $value) = @_;
+    my %value;
 
     $key = $1 if ($key =~ /^\S+:(.*)$/);
 
@@ -112,9 +113,17 @@ sub add_metadata {
 
     return if (!$meta);
 
+    foreach my $vkey (keys(%{$value})) {
+        if ($vkey =~ /^\S+:(.*)$/) {
+            $value{$1} = $value->{$vkey};
+        } else {
+            $value{$vkey} = $value->{$vkey};
+        }
+    }
+
     my $field = $meta->{field};
     my $type = $Ember::Metadata::TYPES{$field};
-    my $text = $value->{$content_key};
+    my $text = $value{$content_key};
 
     return if (!defined($text));
 
@@ -138,7 +147,13 @@ sub add_metadata {
         push(@{$self->{$field}}, $text) if (defined($text));
     } elsif ($type eq 'hash') {
         $self->{$field} = {} if (!$self->{$field});
-        $self->{$field}{$value->{$meta->{key}}} = $text;
+
+        foreach my $hkey (@{$meta->{keys}}) {
+            if (my $hvalue = $value{$hkey}) {
+                $self->{$field}{$hvalue} = $text;
+                last;
+            }
+        }
     } elsif (defined($meta->{join}) && defined($self->{$field})) {
         $self->{$field} .= $meta->{join} . $text
             if (index($self->{$field}, $text) < 0); # TODO be less crude
@@ -148,7 +163,7 @@ sub add_metadata {
 
     if ($meta->{extra}) {
         foreach my $ekey (keys(%{$meta->{extra}})) {
-            $self->add_metadata($meta->{extra}{$ekey}, $ekey, $value);
+            $self->add_metadata($meta->{extra}{$ekey}, $ekey, \%value);
         }
     }
 }
