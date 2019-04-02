@@ -2,7 +2,7 @@ package Ember::TOC::Spine;
 
 =head1 NAME
 
-Ember::TOC::Spine - OPF spine format table of Contents handling.
+Ember::TOC::Spine - OPF spine format table of contents handling.
 
 =head1 DESCRIPTION
 
@@ -38,10 +38,10 @@ sub new {
         my $id = $ref->{idref};
 
         push(@entries, {
-            id => $id,
+            id      => $id,
             chapter => $id,
-            title => $id,
-            order => $order++,
+            title   => $id,
+            order   => $order++,
         });
     }
 

@@ -64,12 +64,12 @@ Mapping of HTML header tags to the character used to underline them.
 =cut
 
 our %HEADER = (
-    h1 => '=',
-    h2 => '-',
-    h3 => '~',
-    h4 => '"',
-    h5 => "'",
-    h6 => '`'
+    h1  => '=',
+    h2  => '-',
+    h3  => '~',
+    h4  => '"',
+    h5  => "'",
+    h6  => '`',
 );
 
 =back

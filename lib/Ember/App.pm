@@ -62,7 +62,7 @@ sub new {
 
     $self->{config} = $args->{config};
     $self->{screen} = $args->{screen};
-    $self->{width} = 0;
+    $self->{width}  = 0;
     $self->{height} = 0;
 
     return $self;
@@ -209,9 +209,9 @@ sub help_keys {
     my ($self) = @_;
 
     return [
-        [ 'Escape, Q' => 'Go back to the previous screen, or quit Ember' ],
-        [ R => 'Refresh the screen' ],
-        [ H => 'Display this help' ],
+        [ 'Escape, Q'   => 'Go back to the previous screen, or quit Ember' ],
+        [ R             => 'Refresh the screen' ],
+        [ H             => 'Display this help' ],
     ];
 }
 

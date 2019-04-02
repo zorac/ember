@@ -56,8 +56,8 @@ sub new {
 
     my $self = $class->SUPER::new($args);
 
-    $self->{ids} = $args->{ids};
-    $self->{metadata} = $metadata;
+    $self->{ids}        = $args->{ids};
+    $self->{metadata}   = $metadata;
 
     return $self;
 }

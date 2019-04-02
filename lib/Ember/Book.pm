@@ -103,13 +103,13 @@ sub new {
     my $config = $args->{config};
     my ($id, $is_new) = $config->get_id($filename);
 
-    $self->{config} = $config;
-    $self->{vfs} = $vfs;
-    $self->{id} = $id;
-    $self->{is_new} = $is_new ? 1 : 0;
-    $self->{filename} = $filename;
-    $self->{metadata} = {};
-    $self->{chapters} = [];
+    $self->{config}     = $config;
+    $self->{vfs}        = $vfs;
+    $self->{id}         = $id;
+    $self->{is_new}     = $is_new ? 1 : 0;
+    $self->{filename}   = $filename;
+    $self->{metadata}   = {};
+    $self->{chapters}   = [];
 
     return $self;
 }

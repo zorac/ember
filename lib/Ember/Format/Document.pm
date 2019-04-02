@@ -76,15 +76,15 @@ sub data {
     $input = '' if (!defined($input));
 
     # Initialise the format
-    $self->{lines} = \@lines;
-    $self->{line_pos} = \@line_pos;
-    $self->{pos} = 0;
-    $self->{anchors} = \%anchors;
-    $self->{line} = '';
-    $self->{llen} = 0;
-    $self->{space} = 0;
-    $self->{indent} = 0;
-    $self->{indent_once} = 0;
+    $self->{lines}          = \@lines;
+    $self->{line_pos}       = \@line_pos;
+    $self->{pos}            = 0;
+    $self->{anchors}        = \%anchors;
+    $self->{line}           = '';
+    $self->{llen}           = 0;
+    $self->{space}          = 0;
+    $self->{indent}         = 0;
+    $self->{indent_once}    = 0;
 
     $self->render($input); # Do the hard work!
 

@@ -75,11 +75,12 @@ sub new {
     my $prev = $args->{prev};
     my $next = $args->{next};
 
-    $self->{id} = $args->{id};
-    $self->{title} = $args->{title};
-    $self->{path} = $args->{path};
-    $self->{mime} = $args->{mime};
-    $self->{skip} = $args->{skip} ? 1 : 0;
+    $self->{id}     = $args->{id};
+    $self->{title}  = $args->{title};
+    $self->{path}   = $args->{path};
+    $self->{mime}   = $args->{mime};
+    $self->{skip}   = $args->{skip} ? 1 : 0;
+
     weaken($self->{book} = $book) if ($book);
 
     if ($prev) {

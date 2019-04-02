@@ -68,7 +68,7 @@ sub new {
     my ($class, $args) = @_;
     my $self = fields::new($class);
 
-    $self->{args} = $args;
+    $self->{args}   = $args;
     $self->{config} = Ember::Config->open();
 
     return $self;

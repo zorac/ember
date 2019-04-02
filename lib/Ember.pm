@@ -77,7 +77,7 @@ sub new {
     my $self = $class->SUPER::new($args);
 
     $self->{screen} = Ember::Screen->new($args->{debug});
-    $self->{stack} = [];
+    $self->{stack}  = [];
 
     if ($args->{book}) {
         my $book = Ember::Book->open($args->{book}, $self->{config});

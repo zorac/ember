@@ -58,8 +58,8 @@ sub new {
             $members{$member} = 1;
         }
 
-        $self->{zip} = $zip;
-        $self->{members} = \%members;
+        $self->{zip}        = $zip;
+        $self->{members}    = \%members;
     };
 
     return $self->{members} ? $self : undef;

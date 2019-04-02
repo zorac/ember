@@ -56,9 +56,9 @@ sub new {
     my $book = $args->{book};
     my ($chapter, $pos) = $book->get_pos();
 
-    $self->{book} = $book;
-    $self->{chapter} = $chapter;
-    $self->{pos} = $pos;
+    $self->{book}       = $book;
+    $self->{chapter}    = $chapter;
+    $self->{pos}        = $pos;
 
     return $self;
 }

@@ -59,8 +59,8 @@ sub new {
 
     $width = 80 if (!defined($width) || ($width < 1));
 
-    $self->{book} = Ember::Book->open($args->{dump}, $self->{config});
-    $self->{width} = $width;
+    $self->{book}   = Ember::Book->open($args->{dump}, $self->{config});
+    $self->{width}  = $width;
 
     return $self;
 }

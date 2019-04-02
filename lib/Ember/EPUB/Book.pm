@@ -85,12 +85,12 @@ sub new {
         my $item = $manifest{$id};
         my $skip = $ref->{linear} && ($ref->{linear} eq 'no');
         my $chapter = Ember::EPUB::Chapter->new({
-            id => $id,
-            path => $item->{file},
-            mime => $item->{mime},
-            skip => $skip,
-            book => $self,
-            prev => $prev,
+            id      => $id,
+            path    => $item->{file},
+            mime    => $item->{mime},
+            skip    => $skip,
+            book    => $self,
+            prev    => $prev,
         });
 
         $prev = $chapter;
@@ -99,11 +99,11 @@ sub new {
 
     # TODO <guide>
 
-    $self->{metadata} = Ember::Metadata::OPF->new($opf);
-    $self->{toc} = $toc;
-    $self->{manifest} = \%manifest;
-    $self->{chapters} = \@chapters;
-    $self->{rootpath} = $root_path;
+    $self->{metadata}   = Ember::Metadata::OPF->new($opf);
+    $self->{toc}        = $toc;
+    $self->{manifest}   = \%manifest;
+    $self->{chapters}   = \@chapters;
+    $self->{rootpath}   = $root_path;
 
     return $self;
 }

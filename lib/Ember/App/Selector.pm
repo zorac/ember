@@ -136,10 +136,10 @@ sub help_keys {
     my $keys = $self->SUPER::help_keys();
 
     unshift(@{$keys},
-        [ '1-9...' => 'Enter an item number' ],
-        [ 'Backspace' => 'Delete a number' ],
-        [ 'Escape' => 'Cancel item selection' ],
-        [ 'Enter' => 'Select the entered item' ],
+        [ '1-9...'      => 'Enter an item number' ],
+        [ 'Backspace'   => 'Delete a number' ],
+        [ 'Escape'      => 'Cancel item selection' ],
+        [ 'Enter'       => 'Select the entered item' ],
     );
 
     return $keys;

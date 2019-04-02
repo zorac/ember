@@ -65,12 +65,12 @@ sub new {
     my ($class, $args) = @_;
     my $self = $class->SUPER::new($args);
 
-    $self->{pos} = $args->{pos} || 0;
-    $self->{lines} = [];
+    $self->{pos}        = $args->{pos} || 0;
+    $self->{lines}      = [];
     $self->{line_count} = 0;
-    $self->{line_pos} = [];
-    $self->{page} = 1;
-    $self->{page_size} = 0;
+    $self->{line_pos}   = [];
+    $self->{page}       = 1;
+    $self->{page_size}  = 0;
     $self->{page_count} = 1;
 
     return $self;

@@ -50,9 +50,9 @@ sub new {
     my ($class, $args) = @_;
     my $self = $class->SUPER::new($args);
 
-    $self->{terms} = '';
-    $self->{ids} = [];
-    $self->{metadata} = [];
+    $self->{terms}      = '';
+    $self->{ids}        = [];
+    $self->{metadata}   = [];
 
     $self->set_terms($args->{terms});
 
@@ -180,8 +180,8 @@ sub keypress {
             $self->fetch_metadata($count);
 
             return 'push', 'SearchSelect', {
-                ids => $ids,
-                metadata => $self->{metadata}
+                ids         => $ids,
+                metadata    => $self->{metadata}
             };
         }
     } else {
@@ -200,9 +200,9 @@ sub help_keys {
     my $keys = $self->SUPER::help_keys();
 
     unshift(@{$keys},
-        [ 'A-Z...' => 'Enter search terms' ],
-        [ 'Enter' => 'Accept the search terms' ],
-        [ 'Escape' => 'Exit search' ],
+        [ 'A-Z...'  => 'Enter search terms' ],
+        [ 'Enter'   => 'Accept the search terms' ],
+        [ 'Escape'  => 'Exit search' ],
     );
 
     return $keys;

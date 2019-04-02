@@ -99,11 +99,11 @@ sub data {
     }
 
     return {
-        lines => \@lines,
-        line_count => scalar(@lines),
-        line_pos => \@line_pos,
-        max_pos => $pos,
-        anchors => {}
+        lines       => \@lines,
+        line_count  => scalar(@lines),
+        line_pos    => \@line_pos,
+        max_pos     => $pos,
+        anchors     => {}
     }
 }
 
