@@ -62,6 +62,7 @@ sub new {
     my ($root_path) = ($opf_file =~ /^(.*?)[^\/]*$/);
     my $opf = $vfs->read_xml($opf_file);
     my $spine = $opf->{spine}[0];
+    my $guide = $opf->{guide}[0] if (exists($opf->{guide}));
     my (%manifest, $toc, @chapters, $prev);
 
     foreach my $item (@{$opf->{manifest}[0]{item}}) {
@@ -74,7 +75,7 @@ sub new {
         };
     }
 
-    if ($opf->{spine}[0]{toc}) {
+    if ($spine->{toc}) {
         my $ncx_file = $root_path . $manifest{$opf->{spine}[0]{toc}}{file};
         my $ncx = $vfs->read_xml($ncx_file);
 
@@ -100,7 +101,12 @@ sub new {
         push(@chapters, $chapter);
     }
 
-    # TODO <guide>
+    if ($guide) {
+        foreach my $ref (@{$guide->{reference}}) {
+            $self->{start} = [ split(/#/, $ref->{href}) ]
+                if ($ref->{type} eq 'text');
+        }
+    }
 
     $self->{metadata}   = Ember::Metadata::OPF->new($opf);
     $self->{toc}        = $toc;

@@ -20,7 +20,7 @@ retrieving their chapters and other details.
 use 5.008;
 use strict;
 use warnings;
-use fields qw( id filename vfs config metadata toc chapters is_new );
+use fields qw( id filename vfs config metadata toc chapters is_new start );
 
 use Carp;
 use Cwd qw( realpath );
@@ -83,6 +83,10 @@ An array of L<Ember::Chapter> objects contained within this book.
 =item is_new
 
 True if this is the first time the book has been opened.
+
+=item start
+
+The starting position for rewading the book [ $chapter [, $anchor ] ].
 
 =back
 
@@ -180,15 +184,20 @@ sub chapter {
 
 =item get_pos()
 
-Fetch the current chapter and reading position for this book.
+Fetch the current chapter, reading position, and anchor for this book.
 
 =cut
 
 sub get_pos {
     my ($self) = @_;
     my ($id, $pos) = $self->{config}->get_pos($self->{id});
+    my $anchor;
 
-    return $self->chapter($id), $pos || 0
+    if (!$id && $self->{start}) {
+        ($id, $anchor) = @{$self->{start}};
+    }
+
+    return $self->chapter($id), $pos || 0, $anchor;
 }
 
 =item save_pos($chapter, $pos)

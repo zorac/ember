@@ -54,11 +54,12 @@ sub new {
     my ($class, $args) = @_;
     my $self = $class->SUPER::new($args);
     my $book = $args->{book};
-    my ($chapter, $pos) = $book->get_pos();
+    my ($chapter, $pos, $anchor) = $book->get_pos();
 
     $self->{book}       = $book;
     $self->{chapter}    = $chapter;
     $self->{pos}        = $pos;
+    $self->{anchor}     = $anchor;
 
     return $self;
 }

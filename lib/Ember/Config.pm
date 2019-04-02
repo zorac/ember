@@ -138,7 +138,7 @@ Fetch the last chapter and reading position for a given eBook.
 sub get_pos {
     my ($self, $id) = @_;
 
-    return ($self->{db}->{"$id:chapter"}, $self->{db}->{"$id:pos"});
+    return $self->{db}->{"$id:chapter"}, $self->{db}->{"$id:pos"};
 }
 
 =item save_pos($id, $chapter, $pos)
