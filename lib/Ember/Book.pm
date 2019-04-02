@@ -33,14 +33,17 @@ use Ember::VFS;
 
 =over
 
-=item %HINTS
+=item %EXTENSIONS
 
 Mapping of file extensions to likely eBook formats.
 
 =cut
 
-our %HINTS = (
+our %EXTENSIONS = (
     epub    => 'EPUB',
+    epub3   => 'EPUB',
+    ibooks  => 'EPUB',
+    kepub   => 'EPUB',
 );
 
 =back
@@ -127,24 +130,20 @@ sub open {
     $filename = realpath($filename);
     croak("File not found: $filename") unless (-e $filename);
 
+    my ($ext) = ($filename =~ /^.+\.(.+?)$/);
+    my $format = defined($ext) ? $EXTENSIONS{lc($ext)} : undef;
+    # TODO support other formats
+
+    croak('Unable to determine format') if (!defined($format));
+
+    my $book_class = get_class($format, 'Book');
     my $vfs = Ember::VFS->open($filename);
-    my $format;
-
-    if (1) {
-        $format = 'EPUB';
-    }
-
-    $class = get_class($format, 'Book');
-
-    my $book = $class->new({ vfs => $vfs, config => $config });
+    my $book = $book_class->new({ vfs => $vfs, config => $config });
 
     $book->load_external_metadata();
     $book->save_metadata() if ($book->{is_new}); # TODO always?
 
     return $book;
-
-    # TODO support other formats
-    # croak('Unable to determine format');
 }
 
 =back

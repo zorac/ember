@@ -28,6 +28,7 @@ use Carp;
 use Cwd qw( realpath );
 use File::Spec;
 
+use Ember::Book;
 use Ember::Metadata::OPF;
 use Ember::Util;
 
@@ -80,12 +81,39 @@ sub run {
 
     if (-d $path) {
         if (-f File::Spec->join($path, 'metadata.db')) {
-            $self->import_calibre();
+            $self->import_calibre($path);
         } else {
-            $self->import_directory();
+            $self->import_directory($path);
         }
     } else {
         croak("Don't know how to handle library file: $path");
+    }
+}
+
+=item import_directory()
+
+Recursively import a directory of eBooks.
+
+=cut
+
+sub import_directory {
+    my ($self, $path) = @_;
+    my $config = $self->{config};
+
+    opendir(my $dir, $path);
+
+    while (my $file = readdir($dir)) {
+        next if ($file =~ /^\.\.?$/);
+
+        my $filename = File::Spec->join($path, $file);
+
+        if (eval { Ember::Book->open($filename, $config) }) {
+            print "Added $filename\n";
+        } elsif ($@ !~ /^Unable to determine format/) {
+            print "Failed to add $filename\n";
+        } elsif (-d $filename) {
+            $self->import_directory($filename);
+        }
     }
 }
 
@@ -96,9 +124,8 @@ Import something that looks like a Calibre library.
 =cut
 
 sub import_calibre {
-    my ($self) = @_;
+    my ($self, $path) = @_;
     my $config = $self->{config};
-    my $path = $self->{path};
 
     opendir(my $calibre_dir, $path);
 

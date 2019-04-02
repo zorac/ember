@@ -16,6 +16,8 @@ use warnings;
 use base qw( Ember::Book );
 use fields qw( manifest rootpath );
 
+use Carp;
+
 use Ember::EPUB::Chapter;
 use Ember::Metadata::OPF;
 use Ember::TOC::NCX;
@@ -41,8 +43,7 @@ The root path within the EPUB file.
 
 =item new($args)
 
-Open an EPUB book and parse its metadata. Returns undefined if the VFS does not
-contain an EPUB book.
+Open an EPUB book and parse its metadata.
 
 =cut
 
@@ -51,7 +52,9 @@ sub new {
     my $vfs = $args->{vfs};
     my $mime = $vfs->read_text('mimetype');
 
-    return undef if (!$mime || ($mime !~ /application\/epub\+zip/i));
+    croak('Missing MIME type') if (!$mime);
+    croak("Inavlid MIME type for EPUB: $mime")
+        if ($mime !~ /application\/(epub|x-ibooks)\+zip/i); # TODO
 
     my $self = $class->SUPER::new($args);
     my $container = $vfs->read_xml('META-INF/container.xml');

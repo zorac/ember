@@ -6,6 +6,7 @@
 /icloud
 *.epub
 /Ember-*
+/kindle
 /Makefile
 /Makefile.old
 /MANIFEST.bak
