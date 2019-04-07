@@ -27,7 +27,7 @@ use DBM_Filter;
 use File::Spec;
 
 use Ember::Metadata;
-use Ember::Util;
+use Ember::Util qw( get_class );
 
 =head2 Fields
 

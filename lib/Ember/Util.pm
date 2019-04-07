@@ -16,12 +16,13 @@ use warnings;
 use base qw( Exporter );
 
 # These modules are dynamically loaded:
+# use HTML::TreeBuilder 5 -weak;
 # use JSON;
 # use XML::Simple qw( :strict );
 
-our @EXPORT = qw( get_class json_decode json_encode xml_decode xml_decode_file
-    xml_encode );
-our ($JSON, $XML);
+our @EXPORT_OK = qw( get_class html_parse json_parse json_generate
+    xml_parse xml_parse_file xml_generate );
+our ($HTML, $JSON, $XML);
 
 =head2 Exported Methods
 
@@ -48,6 +49,35 @@ sub get_class {
     return $class;
 }
 
+=item html_parse($html)
+
+Parse HTML text into a DOM tree.
+
+=cut
+
+sub html_parse {
+    if (!defined($HTML)) {
+        require 'HTML/TreeBuilder.pm';
+
+        HTML::Element->Use_Weak_Refs(1);
+
+        $HTML = 1;
+    }
+
+    my $tree = HTML::TreeBuilder->new();
+
+    # TODO implicit_body_p_tag? p_strict?
+    $tree->ignore_unknown(0);
+    $tree->store_declarations(0);
+    $tree->parse_content($_[0]);
+    $tree->elementify(); # is now an HTML::Element
+    $tree->delete_ignorable_whitespace();
+    $tree->simplify_pres();
+    $tree->number_lists();
+
+    return $tree;
+}
+
 =item _json()
 
 Return a JSON encoder/decoder.
@@ -64,26 +94,26 @@ sub _json {
     return $JSON;
 }
 
-=item json_decode($json)
+=item json_parse($json)
 
-Decode the given JSON text and return a Perl object.
+Parse the given JSON text and return a Perl object.
 
 =cut
 
-sub json_decode {
+sub json_parse {
     my ($json) = @_;
 
     return unless (defined($json) && ($json ne ''));
     return _json()->decode($json); # TODO error handling
 }
 
-=item json_encode($object)
+=item json_generate($object)
 
-Encode the given Perl objectand return JSON text.
+Generate JSON text corresponsing to a given Perl object.
 
 =cut
 
-sub json_encode {;
+sub json_generate {;
     return _json()->encode($_[0]); # TODO error handling
 }
 
@@ -110,36 +140,36 @@ sub _xml {
     return $XML;
 }
 
-=item xml_decode($xml)
+=item xml_parse($xml)
 
-Decode the given XML text and return a Perl object.
+Parse the given XML text and return a Perl object.
 
 =cut
 
-sub xml_decode {
+sub xml_parse {
     my ($xml) = @_;
 
     return unless (defined($xml) && ($xml ne ''));
     return _xml()->parse_string($xml); # TODO error handling
 }
 
-=item xml_decode_file($path)
+=item xml_parse_file($path)
 
-Decode the given XML file and return a Perl object.
+Parse the given XML file and return a Perl object.
 
 =cut
 
-sub xml_decode_file {
+sub xml_parse_file {
     return _xml()->parse_file($_[0]); # TODO error handling
 }
 
-=item xml_encode($object)
+=item xml_generate($object)
 
-Encode the given Perl objectand return XML text.
+Generate XML text corresponsing to a given Perl object.
 
 =cut
 
-sub xml_encode {
+sub xml_generate {
     return _xml()->encode($_[0]); # TODO error handling
 }
 

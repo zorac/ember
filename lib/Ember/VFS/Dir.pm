@@ -19,6 +19,8 @@ use base qw( Ember::VFS );
 use File::Slurp;
 use File::Spec;
 
+use Ember::Util qw( xml_parse_file );
+
 =head2 Class Methods
 
 =over
@@ -59,6 +61,22 @@ sub read_text {
 
     return unless (-f $path);
     return scalar(read_file($path, { binmode => ':utf8' }));
+}
+
+=item read_xml($path)
+
+Read the file at a given path, parse it as XML, and return the parsed content.
+Returns undefined if the file does not exist.
+
+=cut
+
+sub read_xml {
+    my ($self, $path) = @_;
+
+    $path = File::Spec->join($self->{filename}, $path);
+
+    return unless (-f $path);
+    return xml_parse_file($path);
 }
 
 =item write_text($path, $content)

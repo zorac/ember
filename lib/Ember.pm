@@ -28,7 +28,7 @@ use Carp;
 
 use Ember::Book;
 use Ember::Screen;
-use Ember::Util;
+use Ember::Util qw( get_class );
 
 =head2 Constants
 

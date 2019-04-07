@@ -30,7 +30,7 @@ use File::Spec;
 
 use Ember::Book;
 use Ember::Metadata::OPF;
-use Ember::Util;
+use Ember::Util qw( xml_parse_file );
 
 =head2 Fields
 
@@ -162,7 +162,7 @@ sub import_calibre {
                 print "Adding $book_file...\n";
 
                 my $id = $config->get_id($book_file);
-                my $opf = xml_decode_file($metadata_file);
+                my $opf = xml_parse_file($metadata_file);
                 my $metadata = Ember::Metadata::OPF->new($opf);
 
                 $config->set_metadata($id, $metadata);

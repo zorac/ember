@@ -25,7 +25,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Ember::Args;
 use Ember::Script;
-use Ember::Util;
+use Ember::Util qw( get_class );
 
 my $args = Ember::Args->new(@ARGV);
 my ($class, $app);

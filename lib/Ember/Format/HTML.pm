@@ -16,7 +16,7 @@ use warnings;
 use base qw( Ember::Format::Document );
 use fields qw( spaced in_header in_list );
 
-use HTML::TreeBuilder 5 -weak;
+use Ember::Util qw( html_parse );
 
 =head2 Constants
 
@@ -125,16 +125,7 @@ Parse an HTML document, and render it to plain text.
 
 sub render {
     my ($self, $input) = @_;
-    my $tree = HTML::TreeBuilder->new();
-
-    # TODO implicit_body_p_tag? p_strict?
-    $tree->ignore_unknown(0);
-    $tree->store_declarations(0);
-    $tree->parse_content($input);
-    $tree->elementify(); # is now an HTML::Element
-    $tree->delete_ignorable_whitespace();
-    $tree->simplify_pres();
-    $tree->number_lists();
+    my $tree = html_parse($input);
 
     $self->{in_header} = 0;
     $self->{in_list} = 0;

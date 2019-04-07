@@ -26,7 +26,7 @@ use Carp;
 use Cwd qw( realpath );
 use File::Basename;
 
-use Ember::Util;
+use Ember::Util qw( get_class );
 use Ember::VFS;
 
 =head2 Constants

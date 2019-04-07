@@ -23,7 +23,7 @@ use fields qw( filename );
 
 use Carp;
 
-use Ember::Util;
+use Ember::Util qw( get_class json_parse json_generate xml_parse xml_generate );
 
 =head2 Constants
 
@@ -140,7 +140,7 @@ Returns undefined if the file does not exist.
 sub read_json {
     my ($self, $path) = @_;
 
-    return json_decode($self->read_text($path));
+    return json_parse($self->read_text($path));
 }
 
 =item write_json($path, $content)
@@ -152,7 +152,7 @@ Encode the given content as JSON and write it to a file at the given path.
 sub write_json {
     my ($self, $path, $content) = @_;
 
-    $self->write_text($path, json_encode($content));
+    $self->write_text($path, json_generate($content));
 }
 
 =item read_xml($path)
@@ -165,7 +165,7 @@ Returns undefined if the file does not exist.
 sub read_xml {
     my ($self, $path) = @_;
 
-    return xml_decode($self->read_text($path));
+    return xml_parse($self->read_text($path));
 }
 
 =item write_xml($path, $content)
@@ -177,7 +177,7 @@ Encode the given content as XML and write it to a file at the given path.
 sub write_xml {
     my ($self, $path, $content) = @_;
 
-    $self->write_text($path, xml_encode($content));
+    $self->write_text($path, xml_generate($content));
 }
 
 =back
