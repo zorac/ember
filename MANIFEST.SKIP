@@ -6,6 +6,7 @@ calibre
 Ember-
 ibooks
 icloud
+kindle
 Makefile(\.old)?$
 MANIFEST.bak
 MYMETA

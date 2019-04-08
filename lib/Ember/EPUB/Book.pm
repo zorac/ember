@@ -20,6 +20,7 @@ use Carp;
 
 use Ember::EPUB::Chapter;
 use Ember::Metadata::OPF;
+use Ember::TOC::HTML;
 use Ember::TOC::NCX;
 use Ember::TOC::Spine;
 
@@ -67,6 +68,9 @@ sub new {
 
     foreach my $item (@{$opf->{manifest}[0]{item}}) {
         my $id = $item->{id};
+        my $props = $item->{properties} || '';
+
+        $toc = $item->{href} if ($props =~ /nav/);
 
         $manifest{$id} = {
             id      => $id,
@@ -75,7 +79,11 @@ sub new {
         };
     }
 
-    if ($spine->{toc}) {
+    if ($toc) {
+        my $html = $vfs->read_text($root_path . $toc);
+
+        $toc = Ember::TOC::HTML->new($html);
+    } elsif ($spine->{toc}) {
         my $ncx_file = $root_path . $manifest{$opf->{spine}[0]{toc}}{file};
         my $ncx = $vfs->read_xml($ncx_file);
 

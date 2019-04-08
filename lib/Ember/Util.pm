@@ -51,7 +51,7 @@ sub get_class {
 
 =item html_parse($html)
 
-Parse HTML text into a DOM tree.
+Parse HTML text into a DOM tree. Returns an HTML::Element.
 
 =cut
 

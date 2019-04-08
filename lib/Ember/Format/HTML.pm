@@ -119,13 +119,14 @@ sub new {
 
 =item render($input)
 
-Parse an HTML document, and render it to plain text.
+Parse an HTML document, and render it to plain text. Accepts either HTML text,
+or an HTML::Element.
 
 =cut
 
 sub render {
     my ($self, $input) = @_;
-    my $tree = html_parse($input);
+    my $tree = ref($input) ? $input : html_parse($input);
 
     $self->{in_header} = 0;
     $self->{in_list} = 0;

@@ -40,6 +40,7 @@ lib/Ember/Script/Search.pm
 lib/Ember/Script/Version.pm
 lib/Ember/TOC.pm
 lib/Ember/TOC/Entry.pm
+lib/Ember/TOC/HTML.pm
 lib/Ember/TOC/NCX.pm
 lib/Ember/TOC/Spine.pm
 lib/Ember/Util.pm
