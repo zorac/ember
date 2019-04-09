@@ -40,7 +40,7 @@ The current version number for Ember.
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =back
 
