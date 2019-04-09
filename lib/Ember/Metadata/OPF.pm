@@ -48,10 +48,11 @@ our %MAP = (
     'generator'     => { field  => 'generator' },
     # dc:contributor?
     # dc:coverage?
+    # dc:format?
     # dc:relation?
-    # dc:rightsHolder?
-    # dc:subject?
     # dc:source?
+    # dc:subject?
+    # dc:type?
 );
 
 =head2 Class Methods
@@ -67,23 +68,13 @@ Create a new OPF metadata object, given a hashref of parsed OPF XML.
 sub new {
     my ($class, $opf) = @_;
     my $self = $class->SUPER::new();
+    my $version = int($opf->{version});
+    my $metadata = $opf->{metadata}[0];
 
-    foreach my $key (keys(%{$opf->{metadata}[0]})) {
-        my $values = $opf->{metadata}[0]{$key};
-
-        next if (ref($values) ne 'ARRAY');
-
-        foreach my $value (@{$values}) {
-            if ($key eq 'meta') {
-                if (defined($value->{property})) {
-                    $self->add_metadata($value->{property}, '_', $value);
-                } else {
-                    $self->add_metadata($value->{name}, 'content', $value);
-                }
-            } else {
-                $self->add_metadata($key, '_', $value);
-            }
-        }
+    if ($version < 3) {
+        $self->parse_opf2($metadata);
+    } else {
+        $self->parse_opf3($metadata);
     }
 
     if (!defined($self->{title_sort}) && defined($self->{title})) {
@@ -97,14 +88,76 @@ sub new {
     return $self;
 }
 
-=item add_metadata($key, $content_key, $value)
+=item parse_opf2($metadata)
+
+Parse some OPF version 2 metadata entries.
+
+=cut
+
+sub parse_opf2 {
+    my ($self, $metadata) = @_;
+
+    foreach my $key (keys(%{$metadata})) {
+        my $values = $metadata->{$key};
+
+        next if (ref($values) ne 'ARRAY');
+
+        foreach my $value (@{$values}) {
+            if ($key eq 'meta') {
+                $self->add_metadata($value->{name}, $value, 'content');
+            } else {
+                $self->add_metadata($key, $value);
+            }
+        }
+    }
+}
+
+=item parse_opf3($metadata)
+
+Parse some OPF version 3 metadata entries.
+
+=cut
+
+sub parse_opf3 {
+    my ($self, $metadata) = @_;
+    my (@metas, %byid);
+
+    foreach my $key (keys(%{$metadata})) {
+        my $values = $metadata->{$key};
+
+        next if (ref($values) ne 'ARRAY');
+
+        foreach my $value (@{$values}) {
+            if ($key eq 'meta') {
+                if (defined($value->{refines})) {
+                    my $original = $byid{substr($value->{refines}, 1)};
+
+                    $original->{$value->{property}} = $value->{'_'}
+                        if ($original && $value->{property});
+                } elsif (defined($value->{property})) {
+                    push(@metas, [ $value->{property}, $value ]);
+                }
+            } else {
+                push(@metas, [ $key, $value ]);
+                $byid{$value->{id}} = $value if ($value->{id});
+            }
+        }
+    }
+
+    foreach my $meta (@metas) {
+        $self->add_metadata(@{$meta});
+    }
+}
+
+=item add_metadata($key, $value, $content_key)
 
 Add an item of metadata.
 
 =cut
 
 sub add_metadata {
-    my ($self, $key, $content_key, $value) = @_;
+    my ($self, $key, $value, $content_key) = @_;
+
     my %value;
 
     $key = $1 if ($key =~ /^\S+:(.*)$/);
@@ -123,7 +176,7 @@ sub add_metadata {
 
     my $field = $meta->{field};
     my $type = $Ember::Metadata::TYPES{$field};
-    my $text = $value{$content_key};
+    my $text = $value{$content_key || '_'};
 
     return if (!defined($text));
 
@@ -163,7 +216,7 @@ sub add_metadata {
 
     if ($meta->{extra}) {
         foreach my $ekey (keys(%{$meta->{extra}})) {
-            $self->add_metadata($meta->{extra}{$ekey}, $ekey, \%value);
+            $self->add_metadata($meta->{extra}{$ekey}, \%value, $ekey);
         }
     }
 }
